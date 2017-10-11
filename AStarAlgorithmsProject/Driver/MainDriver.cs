@@ -38,7 +38,7 @@ namespace AStarAlgorithmsProject
         //
 
         // Test method for displaying the map and the path A* tool to get the the end point.
-        public string PrintMap()
+        public string TestMap()
         {
             // Hard coded test values
             Point start = new Point(0, 0);

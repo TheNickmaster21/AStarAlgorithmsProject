@@ -29,7 +29,7 @@ namespace AStarAlgorithmsProject
             textBox.TextAlignment = TextAlignment.Center;
 
             main = new MainDriver(); // creates an instance of Main Drive for us to reference whenever the user changes something about the display and get results from.
-            textBox.Text = main.PrintMap(); // shows results of the algorithim, currenttly uses hardcoded start and end positions.
+            textBox.Text = main.TestMap(); // shows results of the algorithim, currenttly uses hardcoded start and end positions.
         }
 
         private void textBox_TextChanged(object sender, TextChangedEventArgs e)

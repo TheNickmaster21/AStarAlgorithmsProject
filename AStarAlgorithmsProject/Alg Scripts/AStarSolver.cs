@@ -56,11 +56,6 @@ namespace AStarAlgorithmsProject
         public List<Point> GetPath(Point s, Point g)
         {
             List<Point> p = new List<Point>();
-            
-            if (!(ValidTile(s) && ValidTile(g)))
-            {
-                throw new ArgumentException("What the fuck is this shit you little bitch why are you giving point parameters out of bounds of the map size I should have you drawn, quartered, then redrawn so you don't look quite so fucking stupid");
-            }
 
             Tile.Start = map[s.X, s.Y];
             Tile.Goal = map[g.X, g.Y];
@@ -103,7 +98,27 @@ namespace AStarAlgorithmsProject
                     return true;
                 }
 
-                TracePath(); // evaluate the adjacent tiles, opening them as needed, and building our path based on the least cost to traverse to each one.
+               List<Tile> neighbors = TracePath(); // evaluate the adjacent tiles, opening them as needed, and building our path based on the least cost to traverse to each one.
+
+                foreach (Tile neighbor in neighbors)
+                {
+                    if (neighbor.State == TileStates.Unchecked) // if it hasnt been checked before, we need only add it to the list of open tiles 
+                    {
+                        neighbor.State = TileStates.Open;
+                        neighbor.Parent = map[Tile.Current.Location.X, Tile.Current.Location.Y]; // go set its parent to be the first tile to disover it by default
+                        openTiles.Add(neighbor);
+                    }
+                    else // if the neighbor is already open, we now need to see if its an ideal node to travel to
+                    {
+                        double gNew; // equal to the sum of the g(x) of it's parent (aka the direct g cost of the parent) and the cost it would take to get to it from the parent tile.
+                        gNew = neighbor.Parent.Distance2Start + Point.Distance(neighbor.Location, neighbor.Parent.Location) * neighbor.CostScalar;
+
+                        if (gNew < neighbor.Distance2Start) // if the gNew cost is a better deal the cost to get to neighbor from start, put this node on the path
+                        {
+                            neighbor.Parent = map[Tile.Current.Location.X, Tile.Current.Location.Y];
+                        }
+                    }
+                }
             }
 
             return false;
@@ -188,7 +203,7 @@ namespace AStarAlgorithmsProject
         } // overload of ValidTile to use a passed point parameter
 
         //Builds the traversal path bassed on the most ideal canidate of the current tile
-        private void TracePath() 
+        private List<Tile> TracePath() 
         {
             List<Tile> result = new List<Tile>();
             int nx = 0;
@@ -206,26 +221,12 @@ namespace AStarAlgorithmsProject
                     {
                         if (neighbor.State != TileStates.Closed) // continue to evaluate if the tile has not already been closed 
                         {
-                            if (neighbor.State == TileStates.Unchecked) // if it hasnt been checked before, we need only add it to the list of open tiles 
-                            {
-                                neighbor.State = TileStates.Open;
-                                neighbor.Parent = map[Tile.Current.Location.X, Tile.Current.Location.Y]; // go set its parent to be the first tile to disover it by default
-                                openTiles.Add(neighbor);
-                            }
-                            else // if the neighbor is already open, we now need to see if its an ideal node to travel to
-                            {
-                                double gNew; // equal to the sum of the g(x) of it's parent (aka the direct g cost of the parent) and the cost it would take to get to it from the parent tile.
-                                gNew = neighbor.Parent.Distance2Start + Point.Distance(neighbor.Location, neighbor.Parent.Location)*neighbor.CostScalar; 
-
-                                if (gNew < neighbor.Distance2Start) // if the gNew cost is a better deal the cost to get to neighbor from start, put this node on the path
-                                {
-                                    neighbor.Parent = map[Tile.Current.Location.X, Tile.Current.Location.Y];
-                                }
-                            }
+                            result.Add(neighbor);
                         }
                     }
                 }
             }
+            return result;
         }
     }
 }
