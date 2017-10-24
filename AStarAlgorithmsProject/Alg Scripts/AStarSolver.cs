@@ -40,9 +40,15 @@ namespace AStarAlgorithmsProject
         }
 
         // Sets the a tile at location l to the value of p
-        public void SetPassalbe(Point l, bool p)
+        public void SetPassable(Point l, bool p)
         {
             map[l.X, l.Y].Passable = p;
+        }
+
+        // Returns if the tile at the location is passible
+        public bool GetPassable(Point l)
+        {
+            return map[l.X, l.Y].Passable;
         }
 
         // Sets the scalar cost of a tile at point l to the value of c
@@ -175,20 +181,9 @@ namespace AStarAlgorithmsProject
 
         private class SortTileByF : IComparer<Tile>
         {
-            public int Compare(Tile t1, Tile t2) // if you want to have some fun, swap these values so that A* will find the most direct but least optimal solution.
+            public int Compare(Tile t1, Tile t2) 
             {
-                if (t1.Cost > t2.Cost)
-                {
-                    return 1;
-                }
-                else if (t1.Cost < t2.Cost)
-                {
-                    return -1;
-                }
-                else
-                {
-                    return 0;
-                }
+                return Math.Sign(t1.Cost - t2.Cost);
             }
         }  // Simple class to be used by the Sort method of the List class. 
 
