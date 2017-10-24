@@ -20,7 +20,7 @@ namespace AStarAlgorithmsProject
     /// </summary>
     public partial class MainWindow : Window
     {
-        MainDriver main;
+        //MainDriver main;
 
         public MainWindow()
         {
@@ -31,43 +31,46 @@ namespace AStarAlgorithmsProject
             main = new MainDriver(); // creates an instance of Main Drive for us to reference whenever the user changes something about the display and get results from.
             textBox.Text = main.TestMap(); // shows results of the algorithim, currenttly uses hardcoded start and end positions.
         */
+            int size = 10;
+
             Grid map = new Grid();
-            //map.Name = "map";
             map.Background = Brushes.Black;
             map.HorizontalAlignment = HorizontalAlignment.Center;
             map.VerticalAlignment = VerticalAlignment.Center;
             map.ShowGridLines = true;
-            map.Height = 100;
-            map.Width = 100;
+            map.Height = 500;
+            map.Width = 500;
 
-            ColumnDefinition colDef1 = new ColumnDefinition();
-            ColumnDefinition colDef2 = new ColumnDefinition();
-            ColumnDefinition colDef3 = new ColumnDefinition();
-            map.ColumnDefinitions.Add(colDef1);
-            map.ColumnDefinitions.Add(colDef2);
-            map.ColumnDefinitions.Add(colDef3);
+            List<ColumnDefinition> columns = new List<ColumnDefinition>();
+            List<RowDefinition> rows = new List<RowDefinition>();
+            Rectangle[,] tiles = new Rectangle[size,size];
 
-            RowDefinition rowDef1 = new RowDefinition();
-            RowDefinition rowDef2 = new RowDefinition();
-            RowDefinition rowDef3 = new RowDefinition();
-            RowDefinition rowDef4 = new RowDefinition();
-            map.RowDefinitions.Add(rowDef1);
-            map.RowDefinitions.Add(rowDef2);
-            map.RowDefinitions.Add(rowDef3);
-            map.RowDefinitions.Add(rowDef4);
+            for (int i = 0; i < size; i++)
+            {
+                columns.Add(new ColumnDefinition());
+                map.ColumnDefinitions.Add(columns[i]);
 
-            Rectangle r = new Rectangle();
-            r.Fill = Brushes.DeepSkyBlue;
-            map.Children.Add(r);
+                rows.Add(new RowDefinition());
+                map.RowDefinitions.Add(rows[i]);
+            }
 
-            Grid.SetColumn(r,0);
-            Grid.SetRow(r, 0);
-            //map.Background = ;
+            for (int i = 0; i < size; i++)
+                for (int j = 0; j < size; j++)
+                { 
+                    tiles[i,j] = new Rectangle();
+                    tiles[i,j].Fill = Brushes.LightGray;
+                    tiles[i, j].MouseDown += Mouse_Clicked;
+                    map.Children.Add(tiles[i,j]);
+                    Grid.SetColumn(tiles[i, j], i);
+                    Grid.SetRow(tiles[i, j],j);
+                }
+
+            this.Content = map;
         }
 
-        private void textBox_TextChanged(object sender, TextChangedEventArgs e)
+        void Mouse_Clicked(object sender, MouseButtonEventArgs e)
         {
-
+            
         }
     }
 }
