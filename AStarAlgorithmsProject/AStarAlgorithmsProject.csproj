@@ -58,7 +58,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="Alg Scripts\BreadthFirstSolver.cs" />
     <Compile Include="Alg Scripts\Point.cs" />
+    <Compile Include="Alg Scripts\SolverUtils.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>

@@ -9,12 +9,6 @@ namespace AStarAlgorithmsProject
 {
     class AStarSolver
     {
-        enum TileStates { Unchecked, Open, Closed }; // enum to title and track the 3 states a tile can be in.
-        static Point[] Directions = new Point[] { new Point(-1, 1), new Point(0, 1), new Point(1, 1),
-                                                  new Point(-1, 0), new Point(1, 0),
-                                                  new Point(-1, -1), new Point(0, -1), new Point(1, -1)
-                                                }; // in order: NW, N, NE, W, E, SW, S, SE
-
         private static int MapSize; // the total NxN size of the map being worked with.
 
         private Tile[,] map; // the map A* will traverse and the tiles therin
@@ -204,7 +198,7 @@ namespace AStarAlgorithmsProject
             int nx = 0;
             int ny = 0;
 
-            foreach (Point p in Directions) // looks at a possible cordinate for every tile neighboring the current tile
+            foreach (Point p in SolverUtils.GetAdvancedDirections()) // looks at a possible cordinate for every tile neighboring the current tile
             {
                 nx = Tile.Current.Location.X + p.X;
                 ny = Tile.Current.Location.Y + p.Y;
