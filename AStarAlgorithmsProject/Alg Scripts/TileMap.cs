@@ -15,18 +15,23 @@ namespace AStarAlgorithmsProject
             map = new Tile[size, size];
         }
 
-        public int getSize()
+        public int GetSize()
         {
             return  map.GetLength(0);
         }
 
-        public Tile get(Point l)
+        public Tile Get(Point l)
         {
             return map[l.X, l.Y];
         }
 
+        public bool TileValid(Point p)
+        {
+            return (p.X >= 0 && p.X < this.GetSize()) && (p.Y >= 0 && p.Y < this.GetSize());
+        } // overload of ValidTile to use a passed point parameter
+
         // "Prime" the map so all tiles are in their default state and their locations set to the proper cordinates in the map
-        public void initMap()
+        public void InitMap()
         {
             for (int i = 0; i < map.GetLength(0); i++)
             {

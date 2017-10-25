@@ -15,25 +15,25 @@ namespace AStarAlgorithmsProject
         public AStarSolver(int mS) // default constructor where mS is the number of rows/columns in the map
         {
             tileMap = new TileMap(mS);
-            tileMap.initMap();
+            tileMap.InitMap();
         }
 
         // Sets the a tile at location l to the value of p
         public void SetPassable(Point l, bool p)
         {
-            tileMap.get(l).Passable = p;
+            tileMap.Get(l).Passable = p;
         }
 
         // Returns if the tile at the location is passible
         public bool GetPassable(Point l)
         {
-            return tileMap.get(l).Passable;
+            return tileMap.Get(l).Passable;
         }
 
         // Sets the scalar cost of a tile at point l to the value of c
         public void SetMovementCost(Point l, int c)
         {
-            tileMap.get(l).CostScalar = c;
+            tileMap.Get(l).CostScalar = c;
         }
 
         // Starting at the goal, traced back through the parents of each tile until it reachest the start tile, and returns a 
@@ -42,8 +42,8 @@ namespace AStarAlgorithmsProject
         {
             List<Point> p = new List<Point>();
 
-            Tile.Start = tileMap.get(s);
-            Tile.Goal = tileMap.get(g);
+            Tile.Start = tileMap.Get(s);
+            Tile.Goal = tileMap.Get(g);
 
             if (Solve())
             {
@@ -89,7 +89,7 @@ namespace AStarAlgorithmsProject
                     if (neighbor.State == TileStates.Unchecked) // if it hasnt been checked before, we need only add it to the list of open tiles 
                     {
                         neighbor.State = TileStates.Open;
-                        neighbor.Parent = tileMap.get(Tile.Current.Location); // go set its parent to be the first tile to disover it by default
+                        neighbor.Parent = tileMap.Get(Tile.Current.Location); // go set its parent to be the first tile to disover it by default
                         openTiles.Add(neighbor);
                     }
                     else // if the neighbor is already open, we now need to see if its an ideal node to travel to
@@ -99,7 +99,7 @@ namespace AStarAlgorithmsProject
 
                         if (gNew < neighbor.Distance2Start) // if the gNew cost is a better deal the cost to get to neighbor from start, put this node on the path
                         {
-                            neighbor.Parent = tileMap.get(Tile.Current.Location);
+                            neighbor.Parent = tileMap.Get(Tile.Current.Location);
                         }
                     }
                 }
@@ -107,16 +107,6 @@ namespace AStarAlgorithmsProject
 
             return false;
         }
-
-        public bool ValidTile(int x, int y)
-        {
-            return (x >= 0 && x < tileMap.getSize()) && (y >= 0 && y < tileMap.getSize());
-        } // returns true if the tile at the given location is within the bounds of the map
-
-        public bool ValidTile(Point p)
-        {
-            return (p.X >= 0 && p.X < tileMap.getSize()) && (p.Y >= 0 && p.Y < tileMap.getSize());
-        } // overload of ValidTile to use a passed point parameter
 
         //Builds the traversal path bassed on the most ideal canidate of the current tile
         private List<Tile> TracePath()
@@ -129,10 +119,11 @@ namespace AStarAlgorithmsProject
             {
                 nx = Tile.Current.Location.X + p.X;
                 ny = Tile.Current.Location.Y + p.Y;
+                Point newP = new Point(nx, ny);
 
-                if (ValidTile(nx, ny)) // continue to evaluate only if the tile is on the map
+                if (tileMap.TileValid(newP)) // continue to evaluate only if the tile is on the map
                 {
-                    Tile neighbor = tileMap.get(new Point(nx, ny)); // the tile being evaluated
+                    Tile neighbor = tileMap.Get(newP); // the tile being evaluated
                     if (neighbor.Passable) // continue to evaluate only if it's a tile that can be mvoed to / on
                     {
                         if (neighbor.State != TileStates.Closed) // continue to evaluate if the tile has not already been closed 
