@@ -10,7 +10,7 @@ namespace AStarAlgorithmsProject
     /// Simple point class to make all our coding lives a little less of a hassle
     /// Supplies the rules for finding distance between two points.
     /// </summary>
-    class Point
+    public class Point
     {
         private int x;
         private int y;

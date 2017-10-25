@@ -55,9 +55,9 @@ namespace AStarAlgorithmsProject
                 for (int j = 0; j < points.GetLength(1); j++)
                 {
                     Point p = points[i, j];
-                    if (path.Contains(p))
+                    if (path.IndexOf(p) > -1)
                     {
-                        data += "[-]";
+                        data += "[" + path.IndexOf(p) + "]";
                     }
                     else if (!solver.GetPassable(p))
                     {
