@@ -1,4 +1,7 @@
-﻿namespace AStarAlgorithmsProject
+﻿using System;
+using System.Collections.Generic;
+
+namespace AStarAlgorithmsProject
 {
 
     // Tile Def and Methods
@@ -48,6 +51,15 @@
         public double Cost // the "f(x)" value of the heuristic. Or "cost of path"
         { get { return Distance2Start * costScalar + Distance2Goal; } }
 
+        public static IComparer<Tile> CostSort = new CostSortComparer();
+
+        private class CostSortComparer : IComparer<Tile>
+        {
+            public int Compare(Tile t1, Tile t2)
+            {
+                return Math.Sign(t1.Cost - t2.Cost);
+            }
+        }  // Simple class to be used by the Sort method of the List class. 
     }
 
 }

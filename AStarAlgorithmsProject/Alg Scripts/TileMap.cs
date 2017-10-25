@@ -17,7 +17,7 @@ namespace AStarAlgorithmsProject
 
         public int getSize()
         {
-            return map.GetLength(0);
+            return  map.GetLength(0);
         }
 
         public Tile get(Point l)

@@ -67,12 +67,11 @@ namespace AStarAlgorithmsProject
         /// <returns>returns true if a valid path was found</returns>
         private bool Solve()
         {
-            SortTileByF sF = new SortTileByF(); // sorting logic for the tiles
             openTiles = new List<Tile>() { Tile.Start }; // the tile to be checked is the initial location
 
             while (openTiles.Count != 0) // Continues until either there are no more tiles to evaluate, or a solution has been found
             {
-                openTiles.Sort(sF); // sor the list so the tiles with the lowest cost are in the front.
+                openTiles.Sort(Tile.CostSort); // sor the list so the tiles with the lowest cost are in the front.
                 Tile.Current = openTiles[0]; // the current tile is now the most optimal tile
                 Tile.Current.State = TileStates.Closed; // close the tile so it is not evaluated again
 
@@ -108,14 +107,6 @@ namespace AStarAlgorithmsProject
 
             return false;
         }
-
-        private class SortTileByF : IComparer<Tile>
-        {
-            public int Compare(Tile t1, Tile t2)
-            {
-                return Math.Sign(t1.Cost - t2.Cost);
-            }
-        }  // Simple class to be used by the Sort method of the List class. 
 
         public bool ValidTile(int x, int y)
         {
