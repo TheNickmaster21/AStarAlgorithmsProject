@@ -21,13 +21,14 @@ namespace AStarAlgorithmsProject
     public partial class MainWindow : Window
     {
         //MainDriver main;
-        int size;
-        Grid map;
+        int size;                       // length and width of the map
+        Grid map;                       // Grid object to hold tiles
         List<ColumnDefinition> columns;
         List<RowDefinition> rows;
 
-        Rectangle[,] tiles;
-        Brush mapBrush = Brushes.DarkOliveGreen;
+        Rectangle[,] tiles;                     //Collection of Rects that function as the map tiles
+        Brush mapBrush = Brushes.DarkOliveGreen;//The brush to color rectangles with, defaulted to start.
+        Brush defaultcolor = Brushes.LightGray; //Default color of tiles
 
         private bool startExists = false;
         private bool goalExists = false;
@@ -35,13 +36,7 @@ namespace AStarAlgorithmsProject
         public MainWindow()
         {
             InitializeComponent();
-            /*textBox.IsReadOnly = true;
-            textBox.TextAlignment = TextAlignment.Center;
 
-            main = new MainDriver(); // creates an instance of Main Drive for us to reference whenever the user changes something about the display and get results from.
-            textBox.Text = main.TestMap(); // shows results of the algorithim, currenttly uses hardcoded start and end positions.
-        */
-            
             size = 10;
             Set_Up_Map(size);
             Create_Buttons();
@@ -51,7 +46,7 @@ namespace AStarAlgorithmsProject
         }
 
         /// <summary>
-        /// Generates the grid (size x size) and fills it with rectangles.
+        /// Generates the grid (size x size) and fills it with default rectangles.
         /// </summary>
         /// <param name="size"></param>
         void Set_Up_Map(int size)
@@ -81,7 +76,7 @@ namespace AStarAlgorithmsProject
                 for (int j = 0; j < size; j++)
                 {
                     tiles[i, j] = new Rectangle();
-                    tiles[i, j].Fill = Brushes.LightGray;
+                    tiles[i, j].Fill = defaultcolor;
                     tiles[i, j].MouseDown += Mouse_Clicked;
                     map.Children.Add(tiles[i, j]);
                     Grid.SetColumn(tiles[i, j], i);
@@ -89,12 +84,19 @@ namespace AStarAlgorithmsProject
                 }
         }
 
+        /// <summary>
+        /// Triggers when one of the rectangles is clicked.
+        /// Changes the color of the tile to mapBrush or default.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void Mouse_Clicked(object sender, MouseButtonEventArgs e)
         {
-            if (rows == null)
+            Rectangle r = (Rectangle)sender;
+            if (r == null)
                 return;
 
-            Rectangle r = (Rectangle)sender;
+            //Prevents duplication of start tile
             if (mapBrush.Equals(Brushes.DarkOliveGreen))
             {
                 if (startExists == true)
@@ -103,13 +105,14 @@ namespace AStarAlgorithmsProject
                     {
                         if (t.Fill.Equals(Brushes.DarkOliveGreen))
                         {
-                            t.Fill = Brushes.LightGray;
+                            t.Fill = defaultcolor;
                         }
                     }
                 }
                 startExists = true;
             }
 
+            //Prevents duplication of goal tile
             if (mapBrush.Equals(Brushes.Maroon))
             {
                 if (goalExists == true)
@@ -118,29 +121,37 @@ namespace AStarAlgorithmsProject
                     {
                         if (t.Fill.Equals(Brushes.Maroon))
                         {
-                            t.Fill = Brushes.LightGray;
+                            t.Fill = defaultcolor;
                         }
                     }
                 }
                 goalExists = true;
             }
 
-            r.Fill = mapBrush;
-               
+            //Allows deletion of tiles (only works for black tiles, don't know why)
+            if (mapBrush.Equals(r.Fill))
+                r.Fill = defaultcolor;
+            else
+                r.Fill = mapBrush;
         }
 
-        void Radio_Changed(object sender,EventArgs e)
+        /// <summary>
+        /// Changes the color of the brush based on the radio button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Radio_Changed(object sender, EventArgs e)
         {
             RadioButton rb = (RadioButton)sender;
 
             if (rb == null)
                 return;
 
-            if(rb.Content.Equals("Start"))
+            if (rb.Content.Equals("Start"))
             {
                 mapBrush = Brushes.DarkOliveGreen;
             }
-            else if(rb.Content.Equals("Goal"))
+            else if (rb.Content.Equals("Goal"))
             {
                 mapBrush = Brushes.Maroon;
             }
@@ -150,6 +161,10 @@ namespace AStarAlgorithmsProject
             }
         }
 
+
+        /// <summary>
+        /// Creates the Radio and Submit buttons then attaches them to the grid.
+        /// </summary>
         private void Create_Buttons()
         {
             RadioButton r = new RadioButton();
@@ -158,6 +173,7 @@ namespace AStarAlgorithmsProject
             map.Children.Add(r);
             r.Content = "Start";
             r.Checked += Radio_Changed;
+            r.IsChecked = true;
 
             r = new RadioButton();
             Grid.SetColumn(r, size + 1);
@@ -173,6 +189,19 @@ namespace AStarAlgorithmsProject
             r.Content = "Wall";
             r.Checked += Radio_Changed;
 
+            Button b = new Button();
+            Grid.SetColumn(b, size + 1);
+            Grid.SetRow(b, 3);
+            b.Content = "Submit";
+            map.Children.Add(b);
+            b.Click += Submit_Clicked;
+
+        }
+
+        public void Submit_Clicked(object sender,EventArgs e)
+        {
+            MessageBox.Show("Magic is Done");
+            //Do Magic
         }
     }
 }
