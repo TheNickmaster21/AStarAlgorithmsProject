@@ -10,12 +10,12 @@ namespace AStarAlgorithmsProject
     /// Simple point class to make all our coding lives a little less of a hassle
     /// Supplies the rules for finding distance between two points.
     /// </summary>
-    class Point
+    public class Point
     {
         private int x;
         private int y;
 
-        public Point(int _x = 0, int _y = 0)
+        public Point(int _x, int _y)
         {
             x = _x;
             y = _y;
@@ -26,6 +26,22 @@ namespace AStarAlgorithmsProject
         { get { return x; } set { x = value; } }
         public int Y
         { get { return y; } set { y = value; } }
+
+        public override bool Equals(object obj)
+        {
+            var point = obj as Point;
+            return point != null &&
+                   X == point.X &&
+                   Y == point.Y;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = -624234986;
+            hashCode = hashCode * -1521134295 + X.GetHashCode();
+            hashCode = hashCode * -1521134295 + Y.GetHashCode();
+            return hashCode;
+        }
 
         /// <summary>
         /// The euclidian distance between p1 and p2

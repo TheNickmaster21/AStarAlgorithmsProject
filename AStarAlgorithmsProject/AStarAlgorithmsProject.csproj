@@ -59,6 +59,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="Alg Scripts\Point.cs" />
+    <Compile Include="Alg Scripts\SolverUtils.cs" />
+    <Compile Include="Alg Scripts\Tile.cs" />
+    <Compile Include="Alg Scripts\TileMap.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
