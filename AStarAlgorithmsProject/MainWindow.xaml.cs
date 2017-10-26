@@ -21,11 +21,16 @@ namespace AStarAlgorithmsProject
     public partial class MainWindow : Window
     {
         //MainDriver main;
-        Canvas parent;
+        int size;
         Grid map;
         List<ColumnDefinition> columns;
         List<RowDefinition> rows;
+
         Rectangle[,] tiles;
+        Brush mapBrush = Brushes.DarkOliveGreen;
+
+        private bool startExists = false;
+        private bool goalExists = false;
 
         public MainWindow()
         {
@@ -37,22 +42,12 @@ namespace AStarAlgorithmsProject
             textBox.Text = main.TestMap(); // shows results of the algorithim, currenttly uses hardcoded start and end positions.
         */
             
-            int size = 10;
-            parent = new Canvas();
-            InitializeBackground(parent);
+            size = 10;
             Set_Up_Map(size);
             Create_Buttons();
-            
-            this.Content = parent;
-        }
 
-        void InitializeBackground (Canvas c)
-        {
-            c.Width = 1;
-            c.Height = 1;
-            c.HorizontalAlignment = HorizontalAlignment.Center;
-            c.VerticalAlignment = VerticalAlignment.Center;
-
+            this.Title = "Project";
+            this.Content = map;
         }
 
         /// <summary>
@@ -62,10 +57,9 @@ namespace AStarAlgorithmsProject
         void Set_Up_Map(int size)
         {
             map = new Grid();
-            parent.Children.Add(map);
-            map.Background = Brushes.Black;
-            //map.HorizontalAlignment = HorizontalAlignment.Center;
-            //map.VerticalAlignment = VerticalAlignment.Center;
+            map.Background = Brushes.WhiteSmoke;
+            map.HorizontalAlignment = HorizontalAlignment.Center;
+            map.VerticalAlignment = VerticalAlignment.Center;
             map.ShowGridLines = true;
             map.Height = 500;
             map.Width = 500;
@@ -74,7 +68,7 @@ namespace AStarAlgorithmsProject
             rows = new List<RowDefinition>();
             tiles = new Rectangle[size, size];
 
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < size + 1; i++)
             {
                 columns.Add(new ColumnDefinition());
                 map.ColumnDefinitions.Add(columns[i]);
@@ -93,23 +87,91 @@ namespace AStarAlgorithmsProject
                     Grid.SetColumn(tiles[i, j], i);
                     Grid.SetRow(tiles[i, j], j);
                 }
-            
         }
 
         void Mouse_Clicked(object sender, MouseButtonEventArgs e)
         {
+            if (rows == null)
+                return;
+
             Rectangle r = (Rectangle)sender;
-            r.Fill = Brushes.DarkOliveGreen;
+            if (mapBrush.Equals(Brushes.DarkOliveGreen))
+            {
+                if (startExists == true)
+                {
+                    foreach (Rectangle t in tiles)
+                    {
+                        if (t.Fill.Equals(Brushes.DarkOliveGreen))
+                        {
+                            t.Fill = Brushes.LightGray;
+                        }
+                    }
+                }
+                startExists = true;
+            }
+
+            if (mapBrush.Equals(Brushes.Maroon))
+            {
+                if (goalExists == true)
+                {
+                    foreach (Rectangle t in tiles)
+                    {
+                        if (t.Fill.Equals(Brushes.Maroon))
+                        {
+                            t.Fill = Brushes.LightGray;
+                        }
+                    }
+                }
+                goalExists = true;
+            }
+
+            r.Fill = mapBrush;
                
+        }
+
+        void Radio_Changed(object sender,EventArgs e)
+        {
+            RadioButton rb = (RadioButton)sender;
+
+            if (rb == null)
+                return;
+
+            if(rb.Content.Equals("Start"))
+            {
+                mapBrush = Brushes.DarkOliveGreen;
+            }
+            else if(rb.Content.Equals("Goal"))
+            {
+                mapBrush = Brushes.Maroon;
+            }
+            else if (rb.Content.Equals("Wall"))
+            {
+                mapBrush = Brushes.Black;
+            }
         }
 
         private void Create_Buttons()
         {
             RadioButton r = new RadioButton();
-            parent.Children.Add(r);
-            r.HorizontalAlignment = HorizontalAlignment.Right;
-            r.VerticalAlignment = VerticalAlignment.Center;
+            Grid.SetColumn(r, size + 1);
+            Grid.SetRow(r, 0);
+            map.Children.Add(r);
             r.Content = "Start";
+            r.Checked += Radio_Changed;
+
+            r = new RadioButton();
+            Grid.SetColumn(r, size + 1);
+            Grid.SetRow(r, 1);
+            map.Children.Add(r);
+            r.Content = "Goal";
+            r.Checked += Radio_Changed;
+
+            r = new RadioButton();
+            Grid.SetColumn(r, size + 1);
+            Grid.SetRow(r, 2);
+            map.Children.Add(r);
+            r.Content = "Wall";
+            r.Checked += Radio_Changed;
 
         }
     }
