@@ -5,8 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AStarAlgorithmsProject"
         mc:Ignorable="d"
-        Title="MainWindow" Height="500
-        " Width="500">
-    
-</Window>
+        Title="MainWindow" Height="800
+        " Width="1000"/>
     
