@@ -11,12 +11,12 @@ namespace AStarAlgorithmsProject
     /// </summary>
     class MainDriver
     {
-        AStarSolver aSS; // I know what I did. 
+        AStarSolver solver; // I know what I did. 
         Point[,] points; // The cordinates for whatever interactable map we decide on.
 
         public MainDriver(int size = 10) // default constructor. Currently, design does not support resizing the map during run time
         {
-            aSS = new AStarSolver(size);
+            solver = new AStarSolver(size);
             points = new Point[size, size];
 
             for (int i = 0; i < points.GetLength(0); i++)
@@ -28,9 +28,9 @@ namespace AStarAlgorithmsProject
             }
 
             // hard coding impassable terrain - testing use only
-            aSS.SetPassalbe(new Point(8, 8), false);
-            aSS.SetPassalbe(new Point(8, 9), false);
-          //  aSS.SetPassalbe(new Point(9, 8), false); //Uncomment to see a map where no solution exsists based on the start and end in PrintMap
+            solver.SetPassable(new Point(8, 8), false);
+            solver.SetPassable(new Point(8, 9), false);
+            //  aSS.SetPassalbe(new Point(9, 8), false); //Uncomment to see a map where no solution exsists based on the start and end in PrintMap
         }
 
         //
@@ -48,27 +48,28 @@ namespace AStarAlgorithmsProject
             string data = "";
             string pathPoints = "";
 
-            List<Point> path = aSS.GetPath(start,end); // what calls the A* algorthim and returns a list of all point in the solution path. Should be empty if no solution exsists.
+            List<Point> path = solver.GetPath(start, end); // what calls the A* algorthim and returns a list of all point in the solution path. Should be empty if no solution exsists.
 
             for (int i = 0; i < points.GetLength(0); i++)
             {
                 for (int j = 0; j < points.GetLength(1); j++)
                 {
-                    bool pathPoint = false;
-                    foreach (Point p in path)
+                    Point p = points[i, j];
+                    if (path.IndexOf(p) > -1)
                     {
-                        if (p.X == points[i, j].X && p.Y == points[i, j].Y)
-                        {
-                            data += "[X]";
-                            pathPoint = true;
-                            break;
-                        }
+                        data += "[" + path.IndexOf(p) + "]";
                     }
-                    if (!pathPoint)
+                    else if (!solver.GetPassable(p))
                     {
-                        data += "[O]";
+                        data += "[X]";
+
+                    }
+                    else
+                    {
+                        data += "[ ]";
                     }
                 }
+
                 data += "\n";
             }
 
