@@ -40,7 +40,7 @@ namespace AStarAlgorithmsProject
             tileMap.Start = tileMap.Get(s);
             tileMap.Goal = tileMap.Get(g);
 
-            if (Solve())
+            if (/*Solve()*/ New_Solve())
             {
 
                 Tile cursor = tileMap.Goal;
@@ -55,6 +55,47 @@ namespace AStarAlgorithmsProject
 
             return p;
         }
+
+
+        /* Brandon's Improved A* Algorithim From Capstone*/
+        private bool New_Solve()
+        {
+            Dictionary<Tile, double> costSoFar = new Dictionary<Tile, double>();
+
+            P_Queue<Tile> openTiles = new P_Queue<Tile>();
+
+            openTiles.Enqueue(tileMap.Start, 0);
+            costSoFar[tileMap.Start] = 0;
+
+            while (openTiles.Count != 0)
+            {
+                tileMap.Current = openTiles.Dequeue();
+                tileMap.Current.State = TileStates.Closed;
+
+                if (tileMap.Current.Equals(tileMap.Goal))
+                {
+                    return true;
+                }
+
+                foreach (Tile neighbor in TracePath())
+                {
+                    double nCost = costSoFar[tileMap.Current] + Point.Distance(tileMap.Current.Location, neighbor.Location) * neighbor.CostScalar;
+
+                    if (neighbor.State == TileStates.Unchecked || nCost < costSoFar[neighbor])
+                    {
+                        neighbor.State = TileStates.Open;
+
+                        costSoFar[neighbor] = nCost;
+                        double prio = nCost + Point.Distance(neighbor.Location, tileMap.Goal.Location);
+                        openTiles.Enqueue(neighbor, prio);
+                        neighbor.Parent = tileMap.Current;
+                    }
+                }
+            }
+
+            return false;
+        }
+        /* Brandon's Improved A* Algorithim From Capstone*/
 
         /// <summary>
         /// The logic for A* traversal
