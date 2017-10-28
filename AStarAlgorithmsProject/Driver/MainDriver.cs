@@ -24,6 +24,14 @@ namespace AStarAlgorithmsProject
             }
 
             // hard coding impassable terrain - testing use only
+            solver.SetPassable(new Point(5, 3), false);
+            solver.SetPassable(new Point(5, 4), false);
+            solver.SetPassable(new Point(5, 5), false);
+            solver.SetPassable(new Point(5, 6), false);
+            solver.SetPassable(new Point(4, 6), false);
+            solver.SetPassable(new Point(3, 6), false);
+            solver.SetPassable(new Point(2, 6), false);
+
             solver.SetPassable(new Point(8, 8), false);
             solver.SetPassable(new Point(8, 9), false);
             //  aSS.SetPassalbe(new Point(9, 8), false); //Uncomment to see a map where no solution exsists based on the start and end in PrintMap
@@ -51,18 +59,22 @@ namespace AStarAlgorithmsProject
                 for (int j = 0; j < points.GetLength(1); j++)
                 {
                     Point p = points[i, j];
-                    if (path.IndexOf(p) > -1)
+                    int index = path.IndexOf(p);
+                    if (index > -1)
                     {
-                        data += "[" + path.IndexOf(p) + "]";
+                        if (index < 10)
+                            data += "[ " + path.IndexOf(p) + "]";
+                        else
+                            data += "[" + path.IndexOf(p) + "]";
                     }
                     else if (!solver.GetPassable(p))
                     {
-                        data += "[X]";
+                        data += "[XX]";
 
                     }
                     else
                     {
-                        data += "[ ]";
+                        data += "[  ]";
                     }
                 }
 

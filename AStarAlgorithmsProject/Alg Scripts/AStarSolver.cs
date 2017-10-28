@@ -5,7 +5,7 @@ namespace AStarAlgorithmsProject
     partial class AStarSolver
     {
         private TileMap tileMap; // the map A* will traverse and the tiles therin
-        private List<Tile> openTiles; // the queue of tiles being evaluated to find the desired path.
+        private List<KeyValuePair<double, Tile>> openTiles; // the queue of tiles being evaluated and their estimated cost
 
         public AStarSolver(int mS) // default constructor where mS is the number of rows/columns in the map
         {
@@ -37,13 +37,13 @@ namespace AStarAlgorithmsProject
         {
             List<Point> p = new List<Point>();
 
-            Tile.Start = tileMap.Get(s);
-            Tile.Goal = tileMap.Get(g);
+            tileMap.Start = tileMap.Get(s);
+            tileMap.Goal = tileMap.Get(g);
 
             if (Solve())
             {
 
-                Tile cursor = Tile.Goal;
+                Tile cursor = tileMap.Goal;
                 while (cursor != null)
                 {
                     p.Add(cursor.Location);
@@ -62,17 +62,19 @@ namespace AStarAlgorithmsProject
         /// <returns>returns true if a valid path was found</returns>
         private bool Solve()
         {
-            openTiles = new List<Tile>() { Tile.Start }; // the tile to be checked is the initial location
+            openTiles = new List<KeyValuePair<double, Tile>>();
+            addTile(tileMap.Start);
 
             while (openTiles.Count != 0) // Continues until either there are no more tiles to evaluate, or a solution has been found
             {
-                openTiles.Sort(Tile.CostSort); // sor the list so the tiles with the lowest cost are in the front.
-                Tile.Current = openTiles[0]; // the current tile is now the most optimal tile
-                Tile.Current.State = TileStates.Closed; // close the tile so it is not evaluated again
+                openTiles.Sort((pair1, pair2) => pair1.Key.CompareTo(pair2.Key));
+
+                tileMap.Current = openTiles[0].Value; // the current tile is now the most optimal tile
+                tileMap.Current.State = TileStates.Closed; // close the tile so it is not evaluated again
 
                 openTiles.RemoveAt(0); // remove from the list of open tiles.
 
-                if (Tile.Current == Tile.Goal) // if we have reached our goal exit the loop
+                if (tileMap.Current == tileMap.Goal) // if we have reached our goal exit the loop
                 {
                     return true;
                 }
@@ -84,17 +86,17 @@ namespace AStarAlgorithmsProject
                     if (neighbor.State == TileStates.Unchecked) // if it hasnt been checked before, we need only add it to the list of open tiles 
                     {
                         neighbor.State = TileStates.Open;
-                        neighbor.Parent = tileMap.Get(Tile.Current.Location); // go set its parent to be the first tile to disover it by default
-                        openTiles.Add(neighbor);
+                        neighbor.Parent = tileMap.Get(tileMap.Current.Location); // go set its parent to be the first tile to disover it by default
+                        addTile(neighbor, Point.Distance(neighbor.Location, neighbor.Parent.Location));
                     }
                     else // if the neighbor is already open, we now need to see if its an ideal node to travel to
                     {
                         double gNew; // equal to the sum of the g(x) of it's parent (aka the direct g cost of the parent) and the cost it would take to get to it from the parent tile.
-                        gNew = neighbor.Parent.Distance2Start + Point.Distance(neighbor.Location, neighbor.Parent.Location) * neighbor.CostScalar;
+                        gNew = neighbor.Parent.CostFromStart + Point.Distance(neighbor.Location, neighbor.Parent.Location) * neighbor.CostScalar;
 
-                        if (gNew < neighbor.Distance2Start) // if the gNew cost is a better deal the cost to get to neighbor from start, put this node on the path
+                        if (gNew < neighbor.CostFromStart) // if the gNew cost is a better deal the cost to get to neighbor from start, put this node on the path
                         {
-                            neighbor.Parent = tileMap.Get(Tile.Current.Location);
+                            neighbor.Parent = tileMap.Get(tileMap.Current.Location);
                         }
                     }
                 }
@@ -112,8 +114,8 @@ namespace AStarAlgorithmsProject
 
             foreach (Point p in SolverUtils.GetAdvancedDirections()) // looks at a possible cordinate for every tile neighboring the current tile
             {
-                nx = Tile.Current.Location.X + p.X;
-                ny = Tile.Current.Location.Y + p.Y;
+                nx = tileMap.Current.Location.X + p.X;
+                ny = tileMap.Current.Location.Y + p.Y;
                 Point newP = new Point(nx, ny);
 
                 if (tileMap.TileValid(newP)) // continue to evaluate only if the tile is on the map
@@ -129,6 +131,17 @@ namespace AStarAlgorithmsProject
                 }
             }
             return result;
+        }
+
+        // Method to add tiles to the openTiles construct, movingDistance defualts to up/down or left/right movement
+        private void addTile(Tile tile, double movingDistance = 1)
+        {
+            openTiles.Add(new KeyValuePair<double, Tile>(estimateTileCost(tile), tile));
+        }
+
+        private double estimateTileCost(Tile tile, double movingDistance = 1)
+        {
+            return tile.CostFromStart + tile.CostScalar + tileMap.DistanceToGoal(tile);
         }
     }
 }
