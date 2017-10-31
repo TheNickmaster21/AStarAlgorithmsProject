@@ -28,10 +28,21 @@ namespace AStarAlgorithmsProject
 
         Rectangle[,] tiles;                     //Collection of Rects that function as the map tiles
         Brush mapBrush = Brushes.DarkOliveGreen;//The brush to color rectangles with, defaulted to start.
-        Brush defaultcolor = Brushes.LightGray; //Default color of tiles
+
+        //brushes that hold colors (read only)
+        Brush defaultColor = Brushes.LightGray; //Default color of tiles
+        Brush startColor = Brushes.DarkOliveGreen;
+        Brush goalColor = Brushes.Maroon;
+        Brush wallColor = Brushes.Black;
+        Brush pathColor = Brushes.SteelBlue;
 
         private bool startExists = false;
         private bool goalExists = false;
+
+        AStarSolver solver;
+        List<Point> path;
+        Point start;
+        Point goal;
 
         public MainWindow()
         {
@@ -76,7 +87,7 @@ namespace AStarAlgorithmsProject
                 for (int j = 0; j < size; j++)
                 {
                     tiles[i, j] = new Rectangle();
-                    tiles[i, j].Fill = defaultcolor;
+                    tiles[i, j].Fill = defaultColor;
                     tiles[i, j].MouseDown += Mouse_Clicked;
                     map.Children.Add(tiles[i, j]);
                     Grid.SetColumn(tiles[i, j], i);
@@ -97,15 +108,15 @@ namespace AStarAlgorithmsProject
                 return;
 
             //Prevents duplication of start tile
-            if (mapBrush.Equals(Brushes.DarkOliveGreen))
+            if (mapBrush.Equals(startColor))
             {
                 if (startExists == true)
                 {
                     foreach (Rectangle t in tiles)
                     {
-                        if (t.Fill.Equals(Brushes.DarkOliveGreen))
+                        if (t.Fill.Equals(startColor))
                         {
-                            t.Fill = defaultcolor;
+                            t.Fill = defaultColor;
                         }
                     }
                 }
@@ -113,15 +124,15 @@ namespace AStarAlgorithmsProject
             }
 
             //Prevents duplication of goal tile
-            if (mapBrush.Equals(Brushes.Maroon))
+            if (mapBrush.Equals(goalColor))
             {
                 if (goalExists == true)
                 {
                     foreach (Rectangle t in tiles)
                     {
-                        if (t.Fill.Equals(Brushes.Maroon))
+                        if (t.Fill.Equals(goalColor))
                         {
-                            t.Fill = defaultcolor;
+                            t.Fill = defaultColor;
                         }
                     }
                 }
@@ -130,7 +141,7 @@ namespace AStarAlgorithmsProject
 
             //Allows deletion of tiles (only works for black tiles, don't know why)
             if (mapBrush.Equals(r.Fill))
-                r.Fill = defaultcolor;
+                r.Fill = defaultColor;
             else
                 r.Fill = mapBrush;
         }
@@ -149,15 +160,15 @@ namespace AStarAlgorithmsProject
 
             if (rb.Content.Equals("Start"))
             {
-                mapBrush = Brushes.DarkOliveGreen;
+                mapBrush = startColor;
             }
             else if (rb.Content.Equals("Goal"))
             {
-                mapBrush = Brushes.Maroon;
+                mapBrush = goalColor;
             }
             else if (rb.Content.Equals("Wall"))
             {
-                mapBrush = Brushes.Black;
+                mapBrush = wallColor;
             }
         }
 
@@ -196,12 +207,76 @@ namespace AStarAlgorithmsProject
             map.Children.Add(b);
             b.Click += Submit_Clicked;
 
+            b = new Button();
+            Grid.SetColumn(b, size + 1);
+            Grid.SetRow(b, 4);
+            b.Content = "Reset";
+            map.Children.Add(b);
+            b.Click += Reset_Map;
+
+        }
+        
+        /// <summary>
+        /// Creates a new AStarSolver
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void Submit_Clicked(object sender, EventArgs e)
+        {
+            solver = new AStarSolver(size);
+            Read_Map();
+            path = solver.GetPath(start, goal);
+            Print_Path();
         }
 
-        public void Submit_Clicked(object sender,EventArgs e)
+        /// <summary>
+        /// Sets walls to impassable, and gets the start and goal points
+        /// </summary>
+        private void Read_Map()
         {
-            MessageBox.Show("Magic is Done");
-            //Do Magic
+            for (int i = 0; i < size; i++)
+                for (int j = 0; j < size; j++)
+                {
+                    if (tiles[i, j].Fill.Equals(wallColor))
+                    {
+                        solver.SetPassable(new Point(i, j), false);
+                    }
+
+                    if (tiles[i, j].Fill.Equals(startColor))
+                    {
+                        start = new Point(i, j);
+                    }
+
+                    if (tiles[i, j].Fill.Equals(goalColor))
+                    {
+                        goal = new Point(i, j);
+                    }
+                }
+        }
+
+        /// <summary>
+        /// Changes the color of the path tiles.
+        /// </summary>
+        private void Print_Path()
+        {
+            foreach(Point p in path)
+            {
+                tiles[p.X, p.Y].Fill = pathColor;
+            }
+        }
+
+
+        /// <summary>
+        /// Returns the map to the default color
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Reset_Map(object sender, EventArgs e)
+        {
+            foreach (Rectangle t in tiles)
+            {
+                t.Fill = defaultColor;
+            }
         }
     }
 }
