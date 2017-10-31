@@ -8,6 +8,10 @@ namespace AStarAlgorithmsProject
 {
     class TileMap
     {
+        public Tile Start; // the starting location the path is comming from
+        public Tile Goal; // the exit location the path must reach
+        public Tile Current; // the current location on the path while tring to get from start to goal
+
         private Tile[,] map;
 
         public TileMap(int size)
@@ -40,6 +44,11 @@ namespace AStarAlgorithmsProject
                     map[i, j] = new Tile(new Point(i, j));
                 }
             }
+        }
+
+        public double DistanceToGoal(Tile tile)
+        {
+            return Point.Distance(tile.Location, Goal.Location);
         }
 
     }

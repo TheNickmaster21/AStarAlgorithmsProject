@@ -58,6 +58,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="Alg Scripts\P_Queue.cs" />
     <Compile Include="Alg Scripts\Point.cs" />
     <Compile Include="Alg Scripts\SolverUtils.cs" />
     <Compile Include="Alg Scripts\Tile.cs" />
