@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AStarAlgorithmsProject"
         mc:Ignorable="d"
-        Title="MainWindow" Height="500
-        " Width="500">
+        Title="MainWindow" Height="800
+        " MinHeight="600" Width="1000" MinWidth="600">
     <TextBox x:Name="textBox" HorizontalAlignment="Center" Height="400" Margin="0,0,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Center" Width="400" FontFamily="Lucida Console"/>
 </Window>
     

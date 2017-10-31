@@ -13,7 +13,7 @@ namespace AStarAlgorithmsProject
         public MainDriver(int size = 10) // default constructor. Currently, design does not support resizing the map during run time
         {
             solver = new AStarSolver(size);
-            points = new Point[size, size];
+           points = new Point[size, size];
 
             for (int i = 0; i < points.GetLength(0); i++)
             {
