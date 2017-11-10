@@ -294,18 +294,31 @@ namespace AStarAlgorithmsProject
             if (selectAlgo == 0)
             {
                 Asolver = new AStarSolver(size);
-                path = Asolver.GetPath(start, goal);
             }
             else if (selectAlgo == 1)
             {
                 Dsolver = new DijkstraSolver(size);
+            }
+            else if (selectAlgo == 2)
+            {
+                //Gsolver = new solver...
+            }
+
+            Read_Map();
+
+            if (selectAlgo == 0)
+            {
+                path = Asolver.GetPath(start, goal);
+            }
+            else if (selectAlgo == 1)
+            {
                 path = Dsolver.getDijkstraPath(start, goal);
             }
             else if (selectAlgo == 2)
             {
-                //Gsolver = new solver... pather = gsolver.getpath
+                //path = gsolver.getpath...
             }
-            Read_Map();
+
             Print_Path();
         }
 
@@ -327,12 +340,12 @@ namespace AStarAlgorithmsProject
                             //Greedy.SetPassable...
                     }
 
-                    if (tiles[i, j].Fill.Equals(startColor))
+                    else if (tiles[i, j].Fill.Equals(startColor))
                     {
                         start = new Point(i, j);
                     }
 
-                    if (tiles[i, j].Fill.Equals(goalColor))
+                    else if (tiles[i, j].Fill.Equals(goalColor))
                     {
                         goal = new Point(i, j);
                     }
