@@ -39,7 +39,8 @@ namespace AStarAlgorithmsProject
         private bool startExists = false;
         private bool goalExists = false;
 
-        AStarSolver solver;
+        DijkstraSolver solver;
+        //AStarSolver solver;
         List<Point> path;
         Point start;
         Point goal;
@@ -223,9 +224,11 @@ namespace AStarAlgorithmsProject
         /// <param name="e"></param>
         public void Submit_Clicked(object sender, EventArgs e)
         {
-            solver = new AStarSolver(size);
+            solver = new DijkstraSolver(size);
+            //solver = new AStarSolver(size);
             Read_Map();
-            path = solver.GetPath(start, goal);
+            path = solver.getDijkstraPath(start, goal);
+            //path = solver.GetPath(start, goal);
             Print_Path();
         }
 

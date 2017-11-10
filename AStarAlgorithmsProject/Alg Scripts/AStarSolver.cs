@@ -31,7 +31,7 @@ namespace AStarAlgorithmsProject
             tileMap.Get(l).CostScalar = c;
         }
 
-        // Starting at the goal, traced back through the parents of each tile until it reachest the start tile, and returns a 
+        // Starting at the goal, traced back through the parents of each tile until it reaches the start tile, and returns a 
         // list of the points on the path in the order of start -> finish
         public List<Point> GetPath(Point s, Point g)
         {
