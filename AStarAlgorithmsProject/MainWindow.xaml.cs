@@ -1,16 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace AStarAlgorithmsProject
@@ -20,7 +13,6 @@ namespace AStarAlgorithmsProject
     /// </summary>
     public partial class MainWindow : Window
     {
-        //MainDriver main;
         int size;                       // length and width of the map
         Grid map;                       // Grid object to hold tiles
         List<ColumnDefinition> columns;
@@ -39,11 +31,14 @@ namespace AStarAlgorithmsProject
         private bool startExists = false;
         private bool goalExists = false;
 
-        DijkstraSolver solver;
-        //AStarSolver solver;
+        AStarSolver Asolver;
+        DijkstraSolver Dsolver;
+        // Greedy solver    Fill in lines ~ 305 & 326
         List<Point> path;
         Point start;
         Point goal;
+
+        int selectAlgo = 0;     // Holds which algorithm to run. (0,A*) (1,Djikstra) (2,Greedy)
 
         public MainWindow()
         {
@@ -68,8 +63,9 @@ namespace AStarAlgorithmsProject
             map.HorizontalAlignment = HorizontalAlignment.Center;
             map.VerticalAlignment = VerticalAlignment.Center;
             map.ShowGridLines = true;
-            map.Height = 500;
-            map.Width = 500;
+            map.Height = 650;
+            map.Width = 650;
+            
 
             columns = new List<ColumnDefinition>();
             rows = new List<RowDefinition>();
@@ -158,18 +154,35 @@ namespace AStarAlgorithmsProject
 
             if (rb == null)
                 return;
-
-            if (rb.Content.Equals("Start"))
+            if (rb.GroupName.Equals("Tile"))
             {
-                mapBrush = startColor;
+                if (rb.Content.Equals("Start"))
+                {
+                    mapBrush = startColor;
+                }
+                else if (rb.Content.Equals("Goal"))
+                {
+                    mapBrush = goalColor;
+                }
+                else if (rb.Content.Equals("Wall"))
+                {
+                    mapBrush = wallColor;
+                }
             }
-            else if (rb.Content.Equals("Goal"))
+            else if(rb.GroupName.Equals("Algo"))
             {
-                mapBrush = goalColor;
-            }
-            else if (rb.Content.Equals("Wall"))
-            {
-                mapBrush = wallColor;
+                if (rb.Content.Equals("A*"))
+                {
+                    selectAlgo = 0;
+                }
+                else if (rb.Content.Equals("Djikstra"))
+                {
+                    selectAlgo = 1;
+                }
+                else if (rb.Content.Equals("Greedy"))
+                {
+                    selectAlgo = 2;
+                }
             }
         }
 
@@ -179,19 +192,23 @@ namespace AStarAlgorithmsProject
         /// </summary>
         private void Create_Buttons()
         {
+            //Right Hand buttons
+            //Tile controls
             RadioButton r = new RadioButton();
             Grid.SetColumn(r, size + 1);
             Grid.SetRow(r, 0);
             map.Children.Add(r);
             r.Content = "Start";
+            r.GroupName = "Tile";
             r.Checked += Radio_Changed;
             r.IsChecked = true;
-
+            
             r = new RadioButton();
             Grid.SetColumn(r, size + 1);
             Grid.SetRow(r, 1);
             map.Children.Add(r);
             r.Content = "Goal";
+            r.GroupName = "Tile";
             r.Checked += Radio_Changed;
 
             r = new RadioButton();
@@ -199,21 +216,71 @@ namespace AStarAlgorithmsProject
             Grid.SetRow(r, 2);
             map.Children.Add(r);
             r.Content = "Wall";
+            r.GroupName = "Tile";
             r.Checked += Radio_Changed;
 
+            r = new RadioButton();
+            Grid.SetColumn(r, size + 1);
+            Grid.SetRow(r, 3);
+            map.Children.Add(r);
+            r.Content = "Cost";
+            r.GroupName = "Tile";
+            r.Checked += Radio_Changed;
+
+            //Allows users to select cost of tile
+            ComboBox cb = new ComboBox();
+            Grid.SetColumn(cb, size + 1);
+            Grid.SetRow(cb, 4);
+            map.Children.Add(cb);
+            TextBox tb;
+            for(int i = 0; i < 4; i++)
+            {
+                tb = new TextBox();
+                tb.Text = i.ToString();
+                cb.Items.Add(tb);
+            }
+            cb.SelectedIndex = 1; 
+            
+            //Map controls
             Button b = new Button();
             Grid.SetColumn(b, size + 1);
-            Grid.SetRow(b, 3);
+            Grid.SetRow(b, 5);
             b.Content = "Submit";
             map.Children.Add(b);
             b.Click += Submit_Clicked;
 
             b = new Button();
             Grid.SetColumn(b, size + 1);
-            Grid.SetRow(b, 4);
+            Grid.SetRow(b, 6);
             b.Content = "Reset";
             map.Children.Add(b);
             b.Click += Reset_Map;
+
+            //Algorithm controls
+            r = new RadioButton();
+            Grid.SetColumn(r, 0);
+            Grid.SetRow(r, size + 1);
+            map.Children.Add(r);
+            r.Content = "A*";
+            r.GroupName = "Algo";
+            r.IsChecked = true;
+            r.Checked += Radio_Changed;
+
+            r = new RadioButton();
+            Grid.SetColumn(r, 1);
+            Grid.SetRow(r, size + 1);
+            map.Children.Add(r);
+            r.Content = "Djikstra";
+            r.GroupName = "Algo";
+            r.Checked += Radio_Changed;
+
+            r = new RadioButton();
+            Grid.SetColumn(r, 2);
+            Grid.SetRow(r, size + 1);
+            map.Children.Add(r);
+            r.Content = "Greedy";
+            r.GroupName = "Algo";
+            r.Checked += Radio_Changed;
 
         }
         
@@ -224,11 +291,34 @@ namespace AStarAlgorithmsProject
         /// <param name="e"></param>
         public void Submit_Clicked(object sender, EventArgs e)
         {
-            solver = new DijkstraSolver(size);
-            //solver = new AStarSolver(size);
+            if (selectAlgo == 0)
+            {
+                Asolver = new AStarSolver(size);
+            }
+            else if (selectAlgo == 1)
+            {
+                Dsolver = new DijkstraSolver(size);
+            }
+            else if (selectAlgo == 2)
+            {
+                //Gsolver = new solver...
+            }
+
             Read_Map();
-            path = solver.getDijkstraPath(start, goal);
-            //path = solver.GetPath(start, goal);
+
+            if (selectAlgo == 0)
+            {
+                path = Asolver.GetPath(start, goal);
+            }
+            else if (selectAlgo == 1)
+            {
+                path = Dsolver.getDijkstraPath(start, goal);
+            }
+            else if (selectAlgo == 2)
+            {
+                //path = gsolver.getpath...
+            }
+
             Print_Path();
         }
 
@@ -242,15 +332,20 @@ namespace AStarAlgorithmsProject
                 {
                     if (tiles[i, j].Fill.Equals(wallColor))
                     {
-                        solver.SetPassable(new Point(i, j), false);
+                        if(selectAlgo == 0)
+                            Asolver.SetPassable(new Point(i, j), false);
+                        else if(selectAlgo == 1)
+                            Dsolver.SetPassable(new Point(i, j), false);
+                        else { }
+                            //Greedy.SetPassable...
                     }
 
-                    if (tiles[i, j].Fill.Equals(startColor))
+                    else if (tiles[i, j].Fill.Equals(startColor))
                     {
                         start = new Point(i, j);
                     }
 
-                    if (tiles[i, j].Fill.Equals(goalColor))
+                    else if (tiles[i, j].Fill.Equals(goalColor))
                     {
                         goal = new Point(i, j);
                     }
