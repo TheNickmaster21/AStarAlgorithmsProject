@@ -32,8 +32,8 @@ namespace AStarAlgorithmsProject
         private bool goalExists = false;
 
         AStarSolver Asolver;
-        // Djikstra solver  Fill in lines 301 & 324
-        // Greedy solver    Fill in lines 305 & 326
+        DijkstraSolver Dsolver;
+        // Greedy solver    Fill in lines ~ 305 & 326
         List<Point> path;
         Point start;
         Point goal;
@@ -298,7 +298,8 @@ namespace AStarAlgorithmsProject
             }
             else if (selectAlgo == 1)
             {
-                //Dsolver = new solver... path = Dsolver.getpath
+                Dsolver = new DijkstraSolver(size);
+                path = Dsolver.getDijkstraPath(start, goal);
             }
             else if (selectAlgo == 2)
             {
@@ -319,11 +320,11 @@ namespace AStarAlgorithmsProject
                     if (tiles[i, j].Fill.Equals(wallColor))
                     {
                         if(selectAlgo == 0)
-                        Asolver.SetPassable(new Point(i, j), false);
-                        else if(selectAlgo == 1) { }
-                        //Djikstra.SetPassable...
+                            Asolver.SetPassable(new Point(i, j), false);
+                        else if(selectAlgo == 1)
+                            Dsolver.SetPassable(new Point(i, j), false);
                         else { }
-                        //Greedy.SetPassable...
+                            //Greedy.SetPassable...
                     }
 
                     if (tiles[i, j].Fill.Equals(startColor))
