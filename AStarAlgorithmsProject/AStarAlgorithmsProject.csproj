@@ -68,6 +68,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Alg Scripts\AStarSolver.cs" />
+    <Compile Include="Alg Scripts\DijkstraSolver.cs" />
     <Compile Include="Driver\MainDriver.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

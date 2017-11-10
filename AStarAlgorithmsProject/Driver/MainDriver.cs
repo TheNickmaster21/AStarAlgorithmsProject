@@ -8,12 +8,18 @@ namespace AStarAlgorithmsProject
     class MainDriver
     {
         AStarSolver solver; // I know what I did. 
+
+        //DijkstraSolver solver; //Not sure how we want to handle the different solvers so it's here for now
+
         Point[,] points; // The cordinates for whatever interactable map we decide on.
 
         public MainDriver(int size = 10) // default constructor. Currently, design does not support resizing the map during run time
         {
             solver = new AStarSolver(size);
-           points = new Point[size, size];
+
+            //solver = new DijkstraSolver(size);
+
+            points = new Point[size, size];
 
             for (int i = 0; i < points.GetLength(0); i++)
             {
@@ -53,6 +59,8 @@ namespace AStarAlgorithmsProject
             string pathPoints = "";
 
             List<Point> path = solver.GetPath(start, end); // what calls the A* algorthim and returns a list of all point in the solution path. Should be empty if no solution exsists.
+
+            //List<Point> path = solver.getDijkstraPath(start, end); //returns the path found via dijkstra
 
             for (int i = 0; i < points.GetLength(0); i++)
             {
