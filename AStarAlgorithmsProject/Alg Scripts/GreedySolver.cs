@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace AStarAlgorithmsProject
 {
-    class DijkstraSolver
+    class GreedySolver
     {
         private TileMap tileMap;
         private List<KeyValuePair<double, Tile>> openTiles;
 
-        public DijkstraSolver(int mapSize)
+        public GreedySolver(int mapSize)
         {
             tileMap = new TileMap(mapSize);
             tileMap.InitMap();
@@ -30,7 +30,7 @@ namespace AStarAlgorithmsProject
             tileMap.Start = tileMap.Get(start);
             tileMap.Goal = tileMap.Get(goal);
 
-            if (SolveDijkstra())
+            if (SolveGreedy())
             {
                 Tile cursor = tileMap.Goal;
                 while (cursor != null)
@@ -45,10 +45,10 @@ namespace AStarAlgorithmsProject
         }
 
         /// <summary>
-        /// finds a path via dijkstra
+        /// finds a path via greedy
         /// </summary>
         /// <returns></returns>
-        private bool SolveDijkstra()
+        private bool SolveGreedy()
         {
             Dictionary<Tile, double> costSoFar = new Dictionary<Tile, double>();
             P_Queue<Tile> openTiles = new P_Queue<Tile>();
@@ -56,7 +56,7 @@ namespace AStarAlgorithmsProject
             openTiles.Enqueue(tileMap.Start, 0);
             costSoFar[tileMap.Start] = 0;
 
-            while(openTiles.Count != 0)
+            while (openTiles.Count != 0)
             {
                 tileMap.Current = openTiles.Dequeue();
                 tileMap.Current.State = TileStates.Closed;
@@ -65,9 +65,9 @@ namespace AStarAlgorithmsProject
                     return true;
 
                 double newCost;
-                foreach(Tile neighbor in FindNeighbors())
+                foreach (Tile neighbor in FindNeighbors())
                 {
-                    newCost = costSoFar[tileMap.Current] + Point.Distance(tileMap.Current.Location, neighbor.Location) * neighbor.CostScalar;
+                    newCost = tileMap.DistanceToGoal(neighbor);
 
                     if (neighbor.State == TileStates.Unchecked || newCost < costSoFar[neighbor])
                     {

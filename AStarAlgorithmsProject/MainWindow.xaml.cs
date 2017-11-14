@@ -33,7 +33,7 @@ namespace AStarAlgorithmsProject
 
         AStarSolver Asolver;
         DijkstraSolver Dsolver;
-        // Greedy solver    Fill in lines ~ 305 & 326
+        GreedySolver Gsolver;
         List<Point> path;
         Point start;
         Point goal;
@@ -65,7 +65,7 @@ namespace AStarAlgorithmsProject
             map.ShowGridLines = true;
             map.Height = 650;
             map.Width = 650;
-            
+
 
             columns = new List<ColumnDefinition>();
             rows = new List<RowDefinition>();
@@ -169,7 +169,7 @@ namespace AStarAlgorithmsProject
                     mapBrush = wallColor;
                 }
             }
-            else if(rb.GroupName.Equals("Algo"))
+            else if (rb.GroupName.Equals("Algo"))
             {
                 if (rb.Content.Equals("A*"))
                 {
@@ -202,7 +202,7 @@ namespace AStarAlgorithmsProject
             r.GroupName = "Tile";
             r.Checked += Radio_Changed;
             r.IsChecked = true;
-            
+
             r = new RadioButton();
             Grid.SetColumn(r, size + 1);
             Grid.SetRow(r, 1);
@@ -233,14 +233,14 @@ namespace AStarAlgorithmsProject
             Grid.SetRow(cb, 4);
             map.Children.Add(cb);
             TextBox tb;
-            for(int i = 0; i < 4; i++)
+            for (int i = 0; i < 4; i++)
             {
                 tb = new TextBox();
                 tb.Text = i.ToString();
                 cb.Items.Add(tb);
             }
-            cb.SelectedIndex = 1; 
-            
+            cb.SelectedIndex = 1;
+
             //Map controls
             Button b = new Button();
             Grid.SetColumn(b, size + 1);
@@ -283,7 +283,7 @@ namespace AStarAlgorithmsProject
             r.Checked += Radio_Changed;
 
         }
-        
+
         /// <summary>
         /// Creates a new AStarSolver
         /// </summary>
@@ -291,32 +291,23 @@ namespace AStarAlgorithmsProject
         /// <param name="e"></param>
         public void Submit_Clicked(object sender, EventArgs e)
         {
-            if (selectAlgo == 0)
+            switch (selectAlgo)
             {
-                Asolver = new AStarSolver(size);
-            }
-            else if (selectAlgo == 1)
-            {
-                Dsolver = new DijkstraSolver(size);
-            }
-            else if (selectAlgo == 2)
-            {
-                //Gsolver = new solver...
-            }
-
-            Read_Map();
-
-            if (selectAlgo == 0)
-            {
-                path = Asolver.GetPath(start, goal);
-            }
-            else if (selectAlgo == 1)
-            {
-                path = Dsolver.getDijkstraPath(start, goal);
-            }
-            else if (selectAlgo == 2)
-            {
-                //path = gsolver.getpath...
+                case 0:
+                    Asolver = new AStarSolver(size);
+                    Read_Map();
+                    path = Asolver.GetPath(start, goal);
+                    break;
+                case 1:
+                    Dsolver = new DijkstraSolver(size);
+                    Read_Map();
+                    path = Dsolver.getPath(start, goal);
+                    break;
+                case 2:
+                    Gsolver = new GreedySolver(size);
+                    Read_Map();
+                    path = Gsolver.getPath(start, goal);
+                    break;
             }
 
             Print_Path();
@@ -332,12 +323,12 @@ namespace AStarAlgorithmsProject
                 {
                     if (tiles[i, j].Fill.Equals(wallColor))
                     {
-                        if(selectAlgo == 0)
+                        if (selectAlgo == 0)
                             Asolver.SetPassable(new Point(i, j), false);
-                        else if(selectAlgo == 1)
+                        else if (selectAlgo == 1)
                             Dsolver.SetPassable(new Point(i, j), false);
-                        else { }
-                            //Greedy.SetPassable...
+                        else
+                            Gsolver.SetPassable(new Point(i, j), false);
                     }
 
                     else if (tiles[i, j].Fill.Equals(startColor))
@@ -357,7 +348,7 @@ namespace AStarAlgorithmsProject
         /// </summary>
         private void Print_Path()
         {
-            foreach(Point p in path)
+            foreach (Point p in path)
             {
                 tiles[p.X, p.Y].Fill = pathColor;
             }
