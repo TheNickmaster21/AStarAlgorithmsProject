@@ -27,18 +27,23 @@ namespace AStarAlgorithmsProject
         Brush goalColor = Brushes.Maroon;
         Brush wallColor = Brushes.Black;
         Brush pathColor = Brushes.SteelBlue;
+        Brush difficultSand = Brushes.SandyBrown;
+        Brush difficultMud = Brushes.SaddleBrown;
+        Brush difficultBrush = Brushes.SandyBrown; //Holds current difficulty
 
         private bool startExists = false;
         private bool goalExists = false;
 
         AStarSolver Asolver;
         DijkstraSolver Dsolver;
-        // Greedy solver    Fill in lines ~ 305 & 326
+        // Greedy solver    Fill in 3 lines in ReadMap() - line#379 && 2 lines in Submit_Clicked -  line#343 
         List<Point> path;
         Point start;
         Point goal;
 
         int selectAlgo = 0;     // Holds which algorithm to run. (0,A*) (1,Djikstra) (2,Greedy)
+        int sandCost = 1;
+        int mudCost = 2;
 
         public MainWindow()
         {
@@ -136,7 +141,7 @@ namespace AStarAlgorithmsProject
                 goalExists = true;
             }
 
-            //Allows deletion of tiles (only works for black tiles, don't know why)
+            //Allows deletion of tiles
             if (mapBrush.Equals(r.Fill))
                 r.Fill = defaultColor;
             else
@@ -168,6 +173,14 @@ namespace AStarAlgorithmsProject
                 {
                     mapBrush = wallColor;
                 }
+                else if (rb.Content.Equals("Cost"))
+                {
+                    mapBrush = difficultBrush;
+                }
+                else if (rb.Content.Equals("Default"))
+                {
+                    mapBrush = defaultColor;
+                }
             }
             else if(rb.GroupName.Equals("Algo"))
             {
@@ -184,6 +197,35 @@ namespace AStarAlgorithmsProject
                     selectAlgo = 2;
                 }
             }
+        }
+
+        /// <summary>
+        /// Changes the difficulty brush to be the correct color, to be assigned to the mapBrush.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Box_Changed(object sender, EventArgs e)
+        {
+            ComboBox combo = (ComboBox)sender;
+
+            if (combo == null)
+                return;
+            Brush temp = difficultBrush;
+
+            if (combo.SelectedIndex == 0)
+            {
+                difficultBrush = difficultSand;
+            }
+            else
+            {
+                difficultBrush = difficultMud;
+            }
+
+            if(mapBrush.Equals(temp))
+            {
+                mapBrush = difficultBrush;
+            }
+
         }
 
 
@@ -227,31 +269,40 @@ namespace AStarAlgorithmsProject
             r.GroupName = "Tile";
             r.Checked += Radio_Changed;
 
+            r = new RadioButton();
+            Grid.SetColumn(r, size + 1);
+            Grid.SetRow(r, 5);
+            map.Children.Add(r);
+            r.Content = "Default";
+            r.GroupName = "Tile";
+            r.Checked += Radio_Changed;
+
             //Allows users to select cost of tile
             ComboBox cb = new ComboBox();
             Grid.SetColumn(cb, size + 1);
             Grid.SetRow(cb, 4);
             map.Children.Add(cb);
             TextBox tb;
-            for(int i = 0; i < 4; i++)
+            for(int i = 1; i < 3; i++)
             {
                 tb = new TextBox();
                 tb.Text = i.ToString();
                 cb.Items.Add(tb);
             }
-            cb.SelectedIndex = 1; 
+            cb.SelectionChanged += Box_Changed;
+            cb.SelectedIndex = 0; 
             
             //Map controls
             Button b = new Button();
             Grid.SetColumn(b, size + 1);
-            Grid.SetRow(b, 5);
+            Grid.SetRow(b, 6);
             b.Content = "Submit";
             map.Children.Add(b);
             b.Click += Submit_Clicked;
 
             b = new Button();
             Grid.SetColumn(b, size + 1);
-            Grid.SetRow(b, 6);
+            Grid.SetRow(b, 7);
             b.Content = "Reset";
             map.Children.Add(b);
             b.Click += Reset_Map;
@@ -338,6 +389,26 @@ namespace AStarAlgorithmsProject
                             Dsolver.SetPassable(new Point(i, j), false);
                         else { }
                             //Greedy.SetPassable...
+                    }
+
+                    else if(tiles[i, j].Fill.Equals(difficultSand))
+                    {
+                        if (selectAlgo == 0)
+                            Asolver.SetMovementCost(new Point(i, j),sandCost);
+                        else if (selectAlgo == 1)
+                            Dsolver.SetMovementCost(new Point(i, j),sandCost);
+                        else { }
+                        //Greedy.SetCost(sand)
+                    }
+
+                    else if (tiles[i, j].Fill.Equals(difficultMud))
+                    {
+                        if (selectAlgo == 0)
+                            Asolver.SetMovementCost(new Point(i, j), mudCost);
+                        else if (selectAlgo == 1)
+                            Dsolver.SetMovementCost(new Point(i, j), mudCost);
+                        else { }
+                        //Greedy.SetCost(mud)
                     }
 
                     else if (tiles[i, j].Fill.Equals(startColor))
