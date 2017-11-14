@@ -33,6 +33,9 @@ namespace AStarAlgorithmsProject
                     this.map[x, y] = new Tile(tileMap.map[x, y]);
                 }
             }
+
+            this.Start = tileMap.Start;
+            this.Goal = tileMap.Goal;
         }
 
         public int GetSize()
@@ -65,6 +68,16 @@ namespace AStarAlgorithmsProject
         public double DistanceToGoal(Tile tile)
         {
             return Point.Distance(tile.Location, Goal.Location);
+        }
+
+        public void SetStart(Point l)
+        {
+            this.Start = Get(l);
+        }
+
+        public void SetGoal(Point l)
+        {
+            this.Goal = Get(l);
         }
 
         // Sets the a tile at location l to the value of p

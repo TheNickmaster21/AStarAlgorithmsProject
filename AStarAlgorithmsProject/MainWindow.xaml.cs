@@ -34,9 +34,8 @@ namespace AStarAlgorithmsProject
         private bool startExists = false;
         private bool goalExists = false;
 
-        AStarSolver Asolver;
-        DijkstraSolver Dsolver;
-        GreedySolver Gsolver;
+        Solver solver;
+        TileMap tileMap;
 
         List<Point> path;
         Point start;
@@ -346,22 +345,18 @@ namespace AStarAlgorithmsProject
             switch (selectAlgo)
             {
                 case 0:
-                    Asolver = new AStarSolver(size);
-                    Read_Map();
-                    path = Asolver.GetPath(start, goal);
+                    solver = new AStarSolver();
                     break;
                 case 1:
-                    Dsolver = new DijkstraSolver(size);
-                    Read_Map();
-                    path = Dsolver.getPath(start, goal);
+                    solver = new DijkstraSolver();
                     break;
                 case 2:
-                    Gsolver = new GreedySolver(size);
-                    Read_Map();
-                    path = Gsolver.getPath(start, goal);
+                    solver = new GreedySolver();
                     break;
             }
 
+            Read_Map();
+            path = solver.getPath(tileMap);
             Print_Path();
         }
 
@@ -370,47 +365,33 @@ namespace AStarAlgorithmsProject
         /// </summary>
         private void Read_Map()
         {
+            tileMap = new TileMap(size);
+            tileMap.InitMap();
+
             for (int i = 0; i < size; i++)
                 for (int j = 0; j < size; j++)
                 {
                     if (tiles[i, j].Fill.Equals(wallColor))
                     {
-                        if (selectAlgo == 0)
-                            Asolver.SetPassable(new Point(i, j), false);
-                        else if (selectAlgo == 1)
-                            Dsolver.SetPassable(new Point(i, j), false);
-                        else
-                            Gsolver.SetPassable(new Point(i, j), false);
+                        tileMap.SetPassable(new Point(i, j), false);   
                     }
-
                     else if(tiles[i, j].Fill.Equals(difficultSand))
                     {
-                        if (selectAlgo == 0)
-                            Asolver.SetMovementCost(new Point(i, j),sandCost);
-                        else if (selectAlgo == 1)
-                            Dsolver.SetMovementCost(new Point(i, j),sandCost);
-                        else { }
-                        //Greedy.SetCost(sand)
+                        tileMap.SetMovementCost(new Point(i, j), sandCost);
                     }
-
                     else if (tiles[i, j].Fill.Equals(difficultMud))
                     {
-                        if (selectAlgo == 0)
-                            Asolver.SetMovementCost(new Point(i, j), mudCost);
-                        else if (selectAlgo == 1)
-                            Dsolver.SetMovementCost(new Point(i, j), mudCost);
-                        else { }
-                        //Greedy.SetCost(mud)
+                        tileMap.SetMovementCost(new Point(i, j), mudCost);
                     }
 
                     else if (tiles[i, j].Fill.Equals(startColor))
                     {
-                        start = new Point(i, j);
+                        tileMap.SetStart(new Point(i, j));
                     }
 
                     else if (tiles[i, j].Fill.Equals(goalColor))
                     {
-                        goal = new Point(i, j);
+                        tileMap.SetGoal( new Point(i, j));
                     }
                 }
         }

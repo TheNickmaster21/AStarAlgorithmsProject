@@ -62,6 +62,7 @@
     <Compile Include="Alg Scripts\GreedySolver.cs" />
     <Compile Include="Alg Scripts\P_Queue.cs" />
     <Compile Include="Alg Scripts\Point.cs" />
+    <Compile Include="Alg Scripts\Solver.cs" />
     <Compile Include="Alg Scripts\SolverUtils.cs" />
     <Compile Include="Alg Scripts\Tile.cs" />
     <Compile Include="Alg Scripts\TileMap.cs" />

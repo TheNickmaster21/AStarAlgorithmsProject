@@ -6,49 +6,14 @@ using System.Threading.Tasks;
 
 namespace AStarAlgorithmsProject
 {
-    class GreedySolver
+    class GreedySolver : Solver
     {
-        private TileMap tileMap;
-        private List<KeyValuePair<double, Tile>> openTiles;
-
-        public GreedySolver(int mapSize)
-        {
-            tileMap = new TileMap(mapSize);
-            tileMap.InitMap();
-        }
-
-        /// <summary>
-        /// Calls the solve method then reorders the list of points to the correct path order
-        /// </summary>
-        /// <param name="start"></param>
-        /// <param name="goal"></param>
-        /// <returns></returns>
-        public List<Point> getPath(Point start, Point goal)
-        {
-            List<Point> path = new List<Point>();
-
-            tileMap.Start = tileMap.Get(start);
-            tileMap.Goal = tileMap.Get(goal);
-
-            if (SolveGreedy())
-            {
-                Tile cursor = tileMap.Goal;
-                while (cursor != null)
-                {
-                    path.Add(cursor.Location);
-                    cursor = cursor.Parent;
-                }
-                path.Reverse();
-            }
-
-            return path;
-        }
 
         /// <summary>
         /// finds a path via greedy
         /// </summary>
         /// <returns></returns>
-        private bool SolveGreedy()
+        override public bool Solve(TileMap tileMap)
         {
             Dictionary<Tile, double> costSoFar = new Dictionary<Tile, double>();
             P_Queue<Tile> openTiles = new P_Queue<Tile>();
@@ -65,7 +30,7 @@ namespace AStarAlgorithmsProject
                     return true;
 
                 double newCost;
-                foreach (Tile neighbor in FindNeighbors())
+                foreach (Tile neighbor in FindNeighbors(tileMap))
                 {
                     newCost = tileMap.DistanceToGoal(neighbor);
 
@@ -87,7 +52,7 @@ namespace AStarAlgorithmsProject
         /// Finds neighbors of the current tile
         /// </summary>
         /// <returns></returns>
-        private List<Tile> FindNeighbors()
+        private List<Tile> FindNeighbors(TileMap tileMap)
         {
             List<Tile> result = new List<Tile>();
             int neighborX = 0;
@@ -112,24 +77,6 @@ namespace AStarAlgorithmsProject
                 }
             }
             return result;
-        }
-
-        // Sets the a tile at location l to the value of p
-        public void SetPassable(Point l, bool p)
-        {
-            tileMap.Get(l).Passable = p;
-        }
-
-        // Returns if the tile at the location is passible
-        public bool GetPassable(Point l)
-        {
-            return tileMap.Get(l).Passable;
-        }
-
-        // Sets the scalar cost of a tile at point l to the value of c
-        public void SetMovementCost(Point l, int c)
-        {
-            tileMap.Get(l).CostScalar = c;
         }
     }
 }
