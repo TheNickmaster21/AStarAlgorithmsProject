@@ -38,8 +38,6 @@ namespace AStarAlgorithmsProject
         TileMap tileMap;
 
         List<Point> path;
-        Point start;
-        Point goal;
 
         int selectAlgo = 0;     // Holds which algorithm to run. (0,A*) (1,Djikstra) (2,Greedy)
         int sandCost = 1;
