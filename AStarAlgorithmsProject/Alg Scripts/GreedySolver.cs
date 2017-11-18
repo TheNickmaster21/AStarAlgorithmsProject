@@ -1,15 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace AStarAlgorithmsProject
 {
-    partial class AStarSolver : Solver
+    class GreedySolver : Solver
     {
 
-        /* Brandon's Improved A* Algorithim From Capstone*/
+        /// <summary>
+        /// finds a path via greedy
+        /// </summary>
+        /// <returns></returns>
         override public bool Solve(TileMap tileMap)
         {
             Dictionary<Tile, double> costSoFar = new Dictionary<Tile, double>();
-
             P_Queue<Tile> openTiles = new P_Queue<Tile>();
 
             openTiles.Enqueue(tileMap.Start, 0);
@@ -21,21 +27,19 @@ namespace AStarAlgorithmsProject
                 tileMap.Current.State = TileStates.Closed;
 
                 if (tileMap.Current.Equals(tileMap.Goal))
-                {
                     return true;
-                }
 
-                foreach (Tile neighbor in TracePath(tileMap))
+                double newCost;
+                foreach (Tile neighbor in FindNeighbors(tileMap))
                 {
-                    double nCost = costSoFar[tileMap.Current] + Point.Distance(tileMap.Current.Location, neighbor.Location) * neighbor.CostScalar;
+                    newCost = tileMap.DistanceToGoal(neighbor);
 
-                    if (neighbor.State == TileStates.Unchecked || nCost < costSoFar[neighbor])
+                    if (neighbor.State == TileStates.Unchecked || newCost < costSoFar[neighbor])
                     {
                         neighbor.State = TileStates.Open;
 
-                        costSoFar[neighbor] = nCost;
-                        double prio = nCost + Point.Distance(neighbor.Location, tileMap.Goal.Location);
-                        openTiles.Enqueue(neighbor, prio);
+                        costSoFar[neighbor] = newCost;
+                        openTiles.Enqueue(neighbor, costSoFar[neighbor]);
                         neighbor.Parent = tileMap.Current;
                     }
                 }
@@ -43,20 +47,22 @@ namespace AStarAlgorithmsProject
 
             return false;
         }
-        /* Brandon's Improved A* Algorithim From Capstone*/
 
-        //Builds the traversal path bassed on the most ideal canidate of the current tile
-        private List<Tile> TracePath(TileMap tileMap)
+        /// <summary>
+        /// Finds neighbors of the current tile
+        /// </summary>
+        /// <returns></returns>
+        private List<Tile> FindNeighbors(TileMap tileMap)
         {
             List<Tile> result = new List<Tile>();
-            int nx = 0;
-            int ny = 0;
+            int neighborX = 0;
+            int neighborY = 0;
 
             foreach (Point p in SolverUtils.GetAdvancedDirections()) // looks at a possible cordinate for every tile neighboring the current tile
             {
-                nx = tileMap.Current.Location.X + p.X;
-                ny = tileMap.Current.Location.Y + p.Y;
-                Point newP = new Point(nx, ny);
+                neighborX = tileMap.Current.Location.X + p.X;
+                neighborY = tileMap.Current.Location.Y + p.Y;
+                Point newP = new Point(neighborX, neighborY);
 
                 if (tileMap.TileValid(newP)) // continue to evaluate only if the tile is on the map
                 {
@@ -71,11 +77,6 @@ namespace AStarAlgorithmsProject
                 }
             }
             return result;
-        }
-
-        private double estimateTileCost(TileMap tileMap, Tile tile, double movingDistance = 1)
-        {
-            return tile.CostFromStart + tile.CostScalar + tileMap.DistanceToGoal(tile);
         }
     }
 }

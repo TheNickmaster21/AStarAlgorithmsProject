@@ -22,13 +22,22 @@ namespace AStarAlgorithmsProject
         private TileStates state; // instance of the enum TileStates to indicate if it's been closed, open, or unchecked by the algorithim
 
         //Default constructor
-        public Tile(Point location, double costFromStart = 0, bool passible = true, TileStates state = TileStates.Unchecked, int cost = 1)
+        public Tile(Point location, double costFromStart = 0, bool passable = true, TileStates state = TileStates.Unchecked, int cost = 1)
         {
             this.location = location;
             this.costFromStart = costFromStart;
-            this.passable = passible;
+            this.passable = passable;
             this.state = state;
             this.costScalar = cost;
+        }
+
+        public Tile(Tile tile)
+        {
+            this.location = tile.location;
+            this.costFromStart = tile.costFromStart;
+            this.passable = tile.passable;
+            this.state = tile.state;
+            this.costScalar = tile.costScalar;
         }
 
         //Accessor Methods

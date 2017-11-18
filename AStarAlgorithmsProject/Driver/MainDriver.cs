@@ -7,7 +7,8 @@ namespace AStarAlgorithmsProject
     /// </summary>
     class MainDriver
     {
-        AStarSolver solver; // I know what I did. 
+        TileMap tileMap;
+        AStarSolver solver; 
 
         //DijkstraSolver solver; //Not sure how we want to handle the different solvers so it's here for now
 
@@ -15,7 +16,8 @@ namespace AStarAlgorithmsProject
 
         public MainDriver(int size = 10) // default constructor. Currently, design does not support resizing the map during run time
         {
-            solver = new AStarSolver(size);
+            tileMap = new TileMap(size);
+            solver = new AStarSolver();
 
             //solver = new DijkstraSolver(size);
 
@@ -30,16 +32,16 @@ namespace AStarAlgorithmsProject
             }
 
             // hard coding impassable terrain - testing use only
-            solver.SetPassable(new Point(5, 3), false);
-            solver.SetPassable(new Point(5, 4), false);
-            solver.SetPassable(new Point(5, 5), false);
-            solver.SetPassable(new Point(5, 6), false);
-            solver.SetPassable(new Point(4, 6), false);
-            solver.SetPassable(new Point(3, 6), false);
-            solver.SetPassable(new Point(2, 6), false);
+            tileMap.SetPassable(new Point(5, 3), false);
+            tileMap.SetPassable(new Point(5, 4), false);
+            tileMap.SetPassable(new Point(5, 5), false);
+            tileMap.SetPassable(new Point(5, 6), false);
+            tileMap.SetPassable(new Point(4, 6), false);
+            tileMap.SetPassable(new Point(3, 6), false);
+            tileMap.SetPassable(new Point(2, 6), false);
 
-            solver.SetPassable(new Point(8, 8), false);
-            solver.SetPassable(new Point(8, 9), false);
+            tileMap.SetPassable(new Point(8, 8), false);
+            tileMap.SetPassable(new Point(8, 9), false);
             //  aSS.SetPassalbe(new Point(9, 8), false); //Uncomment to see a map where no solution exsists based on the start and end in PrintMap
         }
 
@@ -58,7 +60,7 @@ namespace AStarAlgorithmsProject
             string data = "";
             string pathPoints = "";
 
-            List<Point> path = solver.GetPath(start, end); // what calls the A* algorthim and returns a list of all point in the solution path. Should be empty if no solution exsists.
+            List<Point> path = solver.getPath(tileMap); // what calls the A* algorthim and returns a list of all point in the solution path. Should be empty if no solution exsists.
 
             //List<Point> path = solver.getDijkstraPath(start, end); //returns the path found via dijkstra
 
@@ -75,7 +77,7 @@ namespace AStarAlgorithmsProject
                         else
                             data += "[" + path.IndexOf(p) + "]";
                     }
-                    else if (!solver.GetPassable(p))
+                    else if (!tileMap.GetPassable(p))
                     {
                         data += "[XX]";
 

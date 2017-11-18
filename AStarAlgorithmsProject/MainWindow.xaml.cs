@@ -34,12 +34,10 @@ namespace AStarAlgorithmsProject
         private bool startExists = false;
         private bool goalExists = false;
 
-        AStarSolver Asolver;
-        DijkstraSolver Dsolver;
-        // Greedy solver    Fill in 3 lines in ReadMap() - line#379 && 2 lines in Submit_Clicked -  line#343 
+        Solver solver;
+        TileMap tileMap;
+
         List<Point> path;
-        Point start;
-        Point goal;
 
         int selectAlgo = 0;     // Holds which algorithm to run. (0,A*) (1,Djikstra) (2,Greedy)
         int sandCost = 1;
@@ -70,7 +68,7 @@ namespace AStarAlgorithmsProject
             map.ShowGridLines = true;
             map.Height = 650;
             map.Width = 650;
-            
+
 
             columns = new List<ColumnDefinition>();
             rows = new List<RowDefinition>();
@@ -182,7 +180,7 @@ namespace AStarAlgorithmsProject
                     mapBrush = defaultColor;
                 }
             }
-            else if(rb.GroupName.Equals("Algo"))
+            else if (rb.GroupName.Equals("Algo"))
             {
                 if (rb.Content.Equals("A*"))
                 {
@@ -244,7 +242,7 @@ namespace AStarAlgorithmsProject
             r.GroupName = "Tile";
             r.Checked += Radio_Changed;
             r.IsChecked = true;
-            
+
             r = new RadioButton();
             Grid.SetColumn(r, size + 1);
             Grid.SetRow(r, 1);
@@ -334,7 +332,7 @@ namespace AStarAlgorithmsProject
             r.Checked += Radio_Changed;
 
         }
-        
+
         /// <summary>
         /// Creates a new AStarSolver
         /// </summary>
@@ -342,34 +340,21 @@ namespace AStarAlgorithmsProject
         /// <param name="e"></param>
         public void Submit_Clicked(object sender, EventArgs e)
         {
-            if (selectAlgo == 0)
+            switch (selectAlgo)
             {
-                Asolver = new AStarSolver(size);
-            }
-            else if (selectAlgo == 1)
-            {
-                Dsolver = new DijkstraSolver(size);
-            }
-            else if (selectAlgo == 2)
-            {
-                //Gsolver = new solver...
+                case 0:
+                    solver = new AStarSolver();
+                    break;
+                case 1:
+                    solver = new DijkstraSolver();
+                    break;
+                case 2:
+                    solver = new GreedySolver();
+                    break;
             }
 
             Read_Map();
-
-            if (selectAlgo == 0)
-            {
-                path = Asolver.GetPath(start, goal);
-            }
-            else if (selectAlgo == 1)
-            {
-                path = Dsolver.getDijkstraPath(start, goal);
-            }
-            else if (selectAlgo == 2)
-            {
-                //path = gsolver.getpath...
-            }
-
+            path = solver.getPath(tileMap);
             Print_Path();
         }
 
@@ -378,47 +363,33 @@ namespace AStarAlgorithmsProject
         /// </summary>
         private void Read_Map()
         {
+            tileMap = new TileMap(size);
+            tileMap.InitMap();
+
             for (int i = 0; i < size; i++)
                 for (int j = 0; j < size; j++)
                 {
                     if (tiles[i, j].Fill.Equals(wallColor))
                     {
-                        if(selectAlgo == 0)
-                            Asolver.SetPassable(new Point(i, j), false);
-                        else if(selectAlgo == 1)
-                            Dsolver.SetPassable(new Point(i, j), false);
-                        else { }
-                            //Greedy.SetPassable...
+                        tileMap.SetPassable(new Point(i, j), false);   
                     }
-
                     else if(tiles[i, j].Fill.Equals(difficultSand))
                     {
-                        if (selectAlgo == 0)
-                            Asolver.SetMovementCost(new Point(i, j),sandCost);
-                        else if (selectAlgo == 1)
-                            Dsolver.SetMovementCost(new Point(i, j),sandCost);
-                        else { }
-                        //Greedy.SetCost(sand)
+                        tileMap.SetMovementCost(new Point(i, j), sandCost);
                     }
-
                     else if (tiles[i, j].Fill.Equals(difficultMud))
                     {
-                        if (selectAlgo == 0)
-                            Asolver.SetMovementCost(new Point(i, j), mudCost);
-                        else if (selectAlgo == 1)
-                            Dsolver.SetMovementCost(new Point(i, j), mudCost);
-                        else { }
-                        //Greedy.SetCost(mud)
+                        tileMap.SetMovementCost(new Point(i, j), mudCost);
                     }
 
                     else if (tiles[i, j].Fill.Equals(startColor))
                     {
-                        start = new Point(i, j);
+                        tileMap.SetStart(new Point(i, j));
                     }
 
                     else if (tiles[i, j].Fill.Equals(goalColor))
                     {
-                        goal = new Point(i, j);
+                        tileMap.SetGoal( new Point(i, j));
                     }
                 }
         }
@@ -428,7 +399,7 @@ namespace AStarAlgorithmsProject
         /// </summary>
         private void Print_Path()
         {
-            foreach(Point p in path)
+            foreach (Point p in path)
             {
                 tiles[p.X, p.Y].Fill = pathColor;
             }
