@@ -18,6 +18,7 @@ namespace AStarAlgorithmsProject
         List<ColumnDefinition> columns;
         List<RowDefinition> rows;
 
+        Dictionary<Rectangle, Tile> recTiles; // Used to have O(1) acess to a tile from a given rectangle
         Rectangle[,] tiles;                     //Collection of Rects that function as the map tiles
         Brush mapBrush = Brushes.DarkOliveGreen;//The brush to color rectangles with, defaulted to start.
 
@@ -40,8 +41,8 @@ namespace AStarAlgorithmsProject
         List<Point> path;
 
         int selectAlgo = 0;     // Holds which algorithm to run. (0,A*) (1,Djikstra) (2,Greedy)
-        int sandCost = 1;
-        int mudCost = 2;
+        int sandCost = 2;
+        int mudCost = 3;
 
         public MainWindow()
         {
@@ -69,6 +70,12 @@ namespace AStarAlgorithmsProject
             map.Height = 650;
             map.Width = 650;
 
+            path = new List<Point>();
+
+            tileMap = new TileMap(size);
+            //tileMap.InitMap();
+
+            recTiles = new Dictionary<Rectangle, Tile>();
 
             columns = new List<ColumnDefinition>();
             rows = new List<RowDefinition>();
@@ -92,6 +99,8 @@ namespace AStarAlgorithmsProject
                     map.Children.Add(tiles[i, j]);
                     Grid.SetColumn(tiles[i, j], i);
                     Grid.SetRow(tiles[i, j], j);
+                    tileMap[i, j] = new Tile(new Point(i, j));
+                    recTiles.Add(tiles[i, j], tileMap.Get(i, j));
                 }
         }
 
@@ -106,44 +115,146 @@ namespace AStarAlgorithmsProject
             Rectangle r = (Rectangle)sender;
             if (r == null)
                 return;
+            Tile tile;
+            recTiles.TryGetValue(r, out tile);
+
+            if (tile == null)
+            {
+                return;
+            }
+
+            ResetPathOnClick();
 
             //Prevents duplication of start tile
             if (mapBrush.Equals(startColor))
             {
+                if (tile == tileMap.Goal)
+                {
+                    goalExists = false;
+                    tileMap.Goal = null;
+                }
+                if (!tile.Passable)
+                {
+                    tile.Passable = true;
+                }
                 if (startExists == true)
                 {
-                    foreach (Rectangle t in tiles)
-                    {
-                        if (t.Fill.Equals(startColor))
-                        {
-                            t.Fill = defaultColor;
-                        }
-                    }
+                    tiles[tileMap.Start.Location.X, tileMap.Start.Location.Y].Fill = defaultColor;
                 }
+                tileMap.SetStart(tile.Location);
+                tileMap.SetMovementCost(tile.Location, 1);
+                r.Fill = startColor;
                 startExists = true;
             }
 
             //Prevents duplication of goal tile
-            if (mapBrush.Equals(goalColor))
+            else if (mapBrush.Equals(goalColor))
             {
+                if (tile == tileMap.Start)
+                {
+                    startExists = false;
+                    tileMap.Start = null;
+                }
+                if (!tile.Passable)
+                {
+                    tile.Passable = true;
+                }
                 if (goalExists == true)
                 {
-                    foreach (Rectangle t in tiles)
-                    {
-                        if (t.Fill.Equals(goalColor))
-                        {
-                            t.Fill = defaultColor;
-                        }
-                    }
+                    tiles[tileMap.Goal.Location.X, tileMap.Goal.Location.Y].Fill = defaultColor;
                 }
+                tileMap.SetGoal(tile.Location);
+                tileMap.SetMovementCost(tile.Location, 1);
+                r.Fill = goalColor;
                 goalExists = true;
             }
 
-            //Allows deletion of tiles
-            if (mapBrush.Equals(r.Fill))
+            else if (mapBrush.Equals(wallColor)) // make an impassible tile (cant be 
+            {
+                if (tile != tileMap.Goal && tile != tileMap.Start)
+                {
+                    tile.Passable = false;
+                    r.Fill = wallColor;
+                }
+            }
+
+            else if (mapBrush.Equals(difficultBrush)) // set tile cost and color pased on the terrain type
+            {
+
+                if (tile == tileMap.Goal)
+                {
+                    goalExists = false;
+                    tileMap.Goal = null;
+                }
+                else if (tile == tileMap.Start)
+                {
+                    startExists = false;
+                    tileMap.Start = null;
+                }
+
+                if (!tile.Passable)
+                {
+                    tile.Passable = true;
+                }
+                tile.CostScalar = difficultBrush == difficultSand ? sandCost : mudCost;
+                r.Fill = SetRectangleFillByCost(tile);
+            }
+
+            else if (mapBrush.Equals(defaultColor)) // "delete" a tile (reset it back to a normal tile)
+            {
+                if (tile == tileMap.Goal)
+                {
+                    goalExists = false;
+                    tileMap.Goal = null;
+                }
+                else if (tile == tileMap.Start)
+                {
+                    startExists = false;
+                    tileMap.Start = null;
+                }
+
+                tile.CostScalar = 1;
+
+                if (!tile.Passable)
+                {
+                    tile.Passable = true;
+                }
+
                 r.Fill = defaultColor;
-            else
-                r.Fill = mapBrush;
+            }
+        }
+
+        public void ResetPathOnClick()
+        {
+            if (path.Count != 0)
+            {
+                foreach (Point p in path)
+                {
+                    tiles[p.X, p.Y].Fill = SetRectangleFillByCost(tileMap.Get(p));
+                }
+            }
+
+            path.Clear();
+        }
+
+        public Brush SetRectangleFillByCost(Tile t)
+        {
+            Brush result;
+
+            switch (t.CostScalar)
+            {
+                case 2:
+                    result = difficultSand;
+                    break;
+                case 3:
+                    result = difficultMud;
+                    break;
+                default:
+                    result = defaultColor;
+                    break;
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -281,7 +392,7 @@ namespace AStarAlgorithmsProject
             Grid.SetRow(cb, 4);
             map.Children.Add(cb);
             TextBox tb;
-            for(int i = 1; i < 3; i++)
+            for(int i = 2; i < 4; i++)
             {
                 tb = new TextBox();
                 tb.Text = i.ToString();
@@ -340,58 +451,27 @@ namespace AStarAlgorithmsProject
         /// <param name="e"></param>
         public void Submit_Clicked(object sender, EventArgs e)
         {
-            switch (selectAlgo)
+            ResetPathOnClick();
+
+            if (goalExists && startExists)
             {
-                case 0:
-                    solver = new AStarSolver();
-                    break;
-                case 1:
-                    solver = new DijkstraSolver();
-                    break;
-                case 2:
-                    solver = new GreedySolver();
-                    break;
-            }
-
-            Read_Map();
-            path = solver.getPath(tileMap);
-            Print_Path();
-        }
-
-        /// <summary>
-        /// Sets walls to impassable, and gets the start and goal points
-        /// </summary>
-        private void Read_Map()
-        {
-            tileMap = new TileMap(size);
-            tileMap.InitMap();
-
-            for (int i = 0; i < size; i++)
-                for (int j = 0; j < size; j++)
+                switch (selectAlgo)
                 {
-                    if (tiles[i, j].Fill.Equals(wallColor))
-                    {
-                        tileMap.SetPassable(new Point(i, j), false);   
-                    }
-                    else if(tiles[i, j].Fill.Equals(difficultSand))
-                    {
-                        tileMap.SetMovementCost(new Point(i, j), sandCost);
-                    }
-                    else if (tiles[i, j].Fill.Equals(difficultMud))
-                    {
-                        tileMap.SetMovementCost(new Point(i, j), mudCost);
-                    }
-
-                    else if (tiles[i, j].Fill.Equals(startColor))
-                    {
-                        tileMap.SetStart(new Point(i, j));
-                    }
-
-                    else if (tiles[i, j].Fill.Equals(goalColor))
-                    {
-                        tileMap.SetGoal( new Point(i, j));
-                    }
+                    case 0:
+                        solver = new AStarSolver();
+                        break;
+                    case 1:
+                        solver = new DijkstraSolver();
+                        break;
+                    case 2:
+                        solver = new GreedySolver();
+                        break;
                 }
+
+                //  Read_Map();
+                path = solver.getPath(tileMap);
+                Print_Path();
+            }
         }
 
         /// <summary>
@@ -399,9 +479,14 @@ namespace AStarAlgorithmsProject
         /// </summary>
         private void Print_Path()
         {
-            foreach (Point p in path)
+            if (path.Count != 0)
             {
-                tiles[p.X, p.Y].Fill = pathColor;
+                path.RemoveAt(0);
+                path.RemoveAt(path.Count - 1);
+                foreach (Point p in path)
+                {
+                    tiles[p.X, p.Y].Fill = pathColor;
+                }
             }
         }
 
@@ -413,10 +498,20 @@ namespace AStarAlgorithmsProject
         /// <param name="e"></param>
         private void Reset_Map(object sender, EventArgs e)
         {
+            if (path.Count != 0)
+            {
+                path.Clear();
+            }
+
             foreach (Rectangle t in tiles)
             {
                 t.Fill = defaultColor;
+                recTiles[t].Passable = true;
+                recTiles[t].CostScalar = 1;
             }
+
+            startExists = false;
+            goalExists = false;
         }
     }
 }

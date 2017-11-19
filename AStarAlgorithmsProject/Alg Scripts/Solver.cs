@@ -18,7 +18,7 @@ namespace AStarAlgorithmsProject
                 }
                 path.Reverse();
             }
-
+            tileMap.ResetTraversal();
             return path;
         }
 
