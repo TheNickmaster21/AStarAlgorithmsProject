@@ -16,16 +16,16 @@ namespace AStarAlgorithmsProject
         public Tile Parent; // the adjacent tile preceeding this one in the calculated path
 
         private Point location; // the tiles location in the 2d map array
-        private double costFromStart; // Used to track how much distance this tile has to the start
+       // private double costFromStart; // Used to track how much distance this tile has to the start
         private int costScalar; // not really used right now, but can be used to indicate any extra cost a it takes to get to a tile. Like difficult terrain costing twice as much movement.
         private bool passable; // if this tile on the map cannot be move to or through, this is false
         private TileStates state; // instance of the enum TileStates to indicate if it's been closed, open, or unchecked by the algorithim
 
         //Default constructor
-        public Tile(Point location, double costFromStart = 0, bool passable = true, TileStates state = TileStates.Unchecked, int cost = 1)
+        public Tile(Point location,/* double costFromStart = 0,*/ bool passable = true, TileStates state = TileStates.Unchecked, int cost = 1)
         {
             this.location = location;
-            this.costFromStart = costFromStart;
+           // this.costFromStart = costFromStart;
             this.passable = passable;
             this.state = state;
             this.costScalar = cost;
@@ -34,7 +34,7 @@ namespace AStarAlgorithmsProject
         public Tile(Tile tile)
         {
             this.location = tile.location;
-            this.costFromStart = tile.costFromStart;
+           // this.costFromStart = tile.costFromStart;
             this.passable = tile.passable;
             this.state = tile.state;
             this.costScalar = tile.costScalar;
@@ -49,7 +49,7 @@ namespace AStarAlgorithmsProject
         { get { return state; } set { state = value; } }
         public int CostScalar
         { get { return costScalar; } set { costScalar = value; } }
-        public double CostFromStart
-        { get { return costFromStart; } set { costFromStart = value; } }
+     //   public double CostFromStart
+      //  { get { return costFromStart; } set { costFromStart = value; } }
     }
 }

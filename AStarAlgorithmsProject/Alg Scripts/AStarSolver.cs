@@ -40,7 +40,6 @@ namespace AStarAlgorithmsProject
                     }
                 }
             }
-
             return false;
         }
         /* Brandon's Improved A* Algorithim From Capstone*/
@@ -70,12 +69,8 @@ namespace AStarAlgorithmsProject
                     }
                 }
             }
-            return result;
-        }
 
-        private double estimateTileCost(TileMap tileMap, Tile tile, double movingDistance = 1)
-        {
-            return tile.CostFromStart + tile.CostScalar + tileMap.DistanceToGoal(tile);
+            return result;
         }
     }
 }

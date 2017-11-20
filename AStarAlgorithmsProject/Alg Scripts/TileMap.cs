@@ -26,9 +26,9 @@ namespace AStarAlgorithmsProject
             this.size = tileMap.size;
             this.map = new Tile[size, size];
 
-            for (int x = 0; x < tileMap.map.GetLength(0); x += 1)
+            for (int x = 0; x < tileMap.map.GetLength(0); ++x)
             {
-                for (int y = 0; y < tileMap.map.GetLength(1); y += 1)
+                for (int y = 0; y < tileMap.map.GetLength(1); ++y)
                 {
                     this.map[x, y] = new Tile(tileMap.map[x, y]);
                 }
@@ -48,20 +48,51 @@ namespace AStarAlgorithmsProject
             return map[l.X, l.Y];
         }
 
+        public Tile Get(int x, int y)
+        {
+            return map[x, y];
+        }
+
         public bool TileValid(Point p)
         {
             return (p.X >= 0 && p.X < this.GetSize()) && (p.Y >= 0 && p.Y < this.GetSize());
         } // overload of ValidTile to use a passed point parameter
 
+        public Tile this[Point key]
+        {
+            get { return Get(key); }
+            set { map[key.X, key.Y] = value; }
+        }
+
+        public Tile this[int i, int j]
+        {
+            get { return map[i, j]; }
+            set { map[i, j] = value; }
+        }
+
         // "Prime" the map so all tiles are in their default state and their locations set to the proper cordinates in the map
         public void InitMap()
         {
-            for (int i = 0; i < map.GetLength(0); i++)
+            for (int i = 0; i < map.GetLength(0); ++i)
             {
-                for (int j = 0; j < map.GetLength(0); j++)
+                for (int j = 0; j < map.GetLength(0); ++j)
                 {
                     map[i, j] = new Tile(new Point(i, j));
                 }
+            }
+        }
+
+        public void ResetTraversal()
+        {
+            foreach (Tile t in map)
+            {
+                if (t.State == TileStates.Unchecked)
+                {
+                    continue;
+                }
+
+                t.State = TileStates.Unchecked;
+                t.Parent = null;
             }
         }
 
