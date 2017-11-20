@@ -58,7 +58,7 @@ namespace AStarAlgorithmsProject
             int neighborX = 0;
             int neighborY = 0;
 
-            foreach (Point p in SolverUtils.GetSimpleDirections()) // looks at a possible cordinate for every tile neighboring the current tile
+            foreach (Point p in SolverUtils.GetAdvancedDirections()) // looks at a possible cordinate for every tile neighboring the current tile
             {
                 neighborX = tileMap.Current.Location.X + p.X;
                 neighborY = tileMap.Current.Location.Y + p.Y;
