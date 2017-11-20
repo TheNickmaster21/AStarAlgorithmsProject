@@ -51,7 +51,7 @@ namespace AStarAlgorithmsProject
             int nx = 0;
             int ny = 0;
 
-            foreach (Point p in SolverUtils.GetAdvancedDirections()) // looks at a possible cordinate for every tile neighboring the current tile
+            foreach (Point p in SolverUtils.GetSimpleDirections()) // looks at a possible cordinate for every tile neighboring the current tile
             {
                 nx = tileMap.Current.Location.X + p.X;
                 ny = tileMap.Current.Location.Y + p.Y;
