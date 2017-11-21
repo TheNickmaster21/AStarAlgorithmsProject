@@ -14,39 +14,41 @@ namespace AStarAlgorithmsProject.Driver
         {
             TileMap tileMap = new TileMap(200);
             tileMap.InitMap();
-            tileMap.Start = tileMap.Get(new Point(0, 0));
+            tileMap.SetStart(new Point(1, 1));
 
             for (int i = 1; i < 200; i += 2)
             {
-                for (int o = 0; o < 200; o += 2)
+                for (int o = 0; o < 200; o++)
                 {
-                    if (((i + o) % 100) / 10 != 0) //Make openings in the lines
+                    if ((i + o) % 100 != 0) //Make openings in the lines
                     {
-                       // tileMap.SetPassable(new Point(i, o), false);
+                        tileMap.SetPassable(new Point(i, o), false);
                     }
                 }
             }
 
             Solver solver = new AStarSolver();
 
-            for (int i = 2; i < 200; i += 40)
+            for (int i = 80; i < 200; i += 10)
             {
-                tileMap.Goal = tileMap.Get(new Point(i, 0));
+                tileMap.SetGoal(new Point(i, i));
 
                 System.Console.WriteLine();
-                System.Console.WriteLine(i); //Where goal is
-                System.Console.WriteLine(solver.getPath(new TileMap(tileMap)).Count); //Length of path
+                TileMap freshMap = new TileMap(tileMap);
+                freshMap.ResetStates();
+                System.Console.WriteLine(solver.getPath(freshMap).Count + " tiles long"); 
 
                 long total = 0;
                 for (int x = 1; x <= 10; x++)
                 {
-                    TileMap freshMap = new TileMap(tileMap);
+                    freshMap = new TileMap(tileMap);
+                    freshMap.ResetStates();
                     Stopwatch stopwatch = Stopwatch.StartNew();
                     solver.getPath(freshMap);
-                    total += stopwatch.ElapsedTicks;
+                    total += stopwatch.ElapsedMilliseconds;
                 }
 
-                System.Console.WriteLine(total / 10); //Average time to get the path
+                System.Console.WriteLine(total / 10 + " ms"); 
             }
         }
     }

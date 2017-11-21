@@ -34,8 +34,8 @@ namespace AStarAlgorithmsProject
                 }
             }
 
-            this.Start = tileMap.Start;
-            this.Goal = tileMap.Goal;
+            this.SetStart(tileMap.Start.Location);
+            this.SetGoal(tileMap.Goal.Location);
         }
 
         public int GetSize()
@@ -78,6 +78,17 @@ namespace AStarAlgorithmsProject
                 for (int j = 0; j < map.GetLength(0); ++j)
                 {
                     map[i, j] = new Tile(new Point(i, j));
+                }
+            }
+        }
+
+        public void ResetStates()
+        {
+            for (int i = 0; i < map.GetLength(0); ++i)
+            {
+                for (int j = 0; j < map.GetLength(0); ++j)
+                {
+                    map[i, j].State = TileStates.Unchecked;
                 }
             }
         }
